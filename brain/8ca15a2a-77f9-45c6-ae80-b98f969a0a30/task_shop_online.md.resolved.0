@@ -1,0 +1,15 @@
+# Task: Migrate Shop Items to Firebase
+
+- [ ] Update `ShopItemModel`
+  - [ ] Add `dx`, `dy`, `scale` fields.
+  - [ ] Add `isOnline` field (default `false`).
+  - [ ] Update `fromJson` and [toJson](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#1000-1014).
+- [ ] Prepare Firestore Data
+  - [ ] Create a JSON array of current [shop_data.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart) items (hats, glasses, neck) with their respective offsets.
+  - [ ] Save this JSON for the user to upload to FireCMS/Firestore collection `shop_items`.
+- [ ] Update [ShopData](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart#6-204)
+  - [ ] Remove hardcoded hats, glasses, and neck items from [shop_data.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart) (except for the `remove_` items and `energy` items).
+- [ ] Implement Fetching and Caching
+  - [ ] Update [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#10-211) (or create a dedicated `ShopService`) to fetch from Firestore `shop_items`.
+  - [ ] Implement local caching (e.g., using `SharedPreferences` or `hive`) to store fetched items.
+  - [ ] Merge fetched online items with local static items (`energy`, `remove_` items) in `itemsByType`.

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Bản kế hoạch chi tiết xây dựng hệ thống Năng lượng ⚡ (Heart System) giống Duolingo. Bao gồm thay đổi trong ProgressService, UI (Header MainWrapper, Dialog Hết Năng Lượng), và Logic trừ năng lượng trong các trò chơi. Kế hoạch cũng đề cập việc phục hồi năng lượng và mở đường cho Subscription.",
+  "updatedAt": "2026-02-20T16:40:10.091342Z"
+}

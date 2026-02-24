@@ -1,0 +1,18 @@
+# Privacy Policy Template Walkthrough
+
+The modern, highly reusable "Privacy Policy" web application template using Next.js (App Router), React, Lucide React, and Tailwind CSS has been successfully built and verified!
+
+## Features Implemented
+- **Configuration-Driven Content:** All privacy policy data including the app name, company info, and sections are centralized in [src/content/privacy-data.ts](file:///Users/devsang/Developer/Template%20Web%20Policy/src/content/privacy-data.ts).
+- **Modern UI & Responsive Design:** Uses Tailwind CSS v4, Lucide Icons, and `@tailwindcss/typography` for an elegant reading experience.
+- **Sticky Desktop sidebar & Collapsible Mobile Navigation:** The Table of Contents automatically highlights the active section as users scroll.
+- **Dark/Light Mode Toggle:** Implemented with `next-themes`, ensuring it seamlessly adapts to user preferences.
+- **Reliable Section Highlighting:** Updated the navigation logic to use deterministic scroll-offset tracking, ensuring that clicking or scrolling accurately updates the active section color.
+- **Production-Ready & Vercel Deployable:** Verified through the `next build` command without significant issues.
+
+## Testing Performed
+- **Linting:** Zero errors during `next lint`.
+- **Building:** The production bundle optimized securely and rapidly via `next build`.
+- **Responsiveness Check:** Both Desktop Sidebar ([TableOfContents.tsx](file:///Users/devsang/Developer/Template%20Web%20Policy/src/components/TableOfContents.tsx)) and Mobile menu ([MobileNav.tsx](file:///Users/devsang/Developer/Template%20Web%20Policy/src/components/MobileNav.tsx)) are configured perfectly for standard breakpoints.
+
+You can now start local development with `npm run dev` or push immediately to Vercel!

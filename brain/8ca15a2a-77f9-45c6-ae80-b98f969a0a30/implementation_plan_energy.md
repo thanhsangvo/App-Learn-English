@@ -1,0 +1,49 @@
+# ⚡ Kế Hoạch Triển Khai Hệ Thống Năng Lượng (Option A)
+
+Mục tiêu: Áp dụng cơ chế tước đoạt năng lượng khi người chơi làm sai để tăng tính kỷ luật học tập, và mở đường bán gói kích hoạt "Năng Lượng Vô Cực" (Subscriptions). Sử dụng biểu tượng `⚡` thay vì tim.
+
+## User Review Required
+> [!IMPORTANT]
+> Anh cần quyết định vài thông số trước khi em code:
+> 1. **Thời gian hồi phục**: Sau khi mất 1 ⚡, mất bao lâu để tự động hồi lại 1 ⚡? Duolingo dùng 4 tiếng/tym (rất gắt nghen). Hoặc anh có thể dùng 20-30 phút/⚡ cho nhẹ nhàng hơn.
+> 2. **Cơ chế Subscription hiện tại**: Tạm thời em sẽ tạo 1 nút "Mua Premium (Unlimited ⚡)", khi bấm vào em có nên hiện ra một Sheet/Dialog giả lập giới thiệu gói mua không? (Vì việc cấu hình In-App Purchase thật sự cần làm sau này trên Google Play Console / App Store).
+
+## Proposed Changes
+
+### Core Logic (ProgressService)
+Sẽ cập nhật `lib/core/services/progress_service.dart`:
+- Thêm biến state `currentEnergy` (tối đa 5 ⚡), mặc định ban đầu là 5.
+- Thêm biến lưu lại thời điểm bị trừ năng lượng gần nhất `lastEnergyRefillTime`.
+- **Logic hồi sinh (Regeneration):** Viết logic tự động cộng lại năng lượng dựa trên chênh lệch thời gian mỗi khi mở app hoặc background Timer.
+- **Hàm `deductEnergy()`**: Bị gọi khi làm sai. Nếu `currentEnergy == 0`, throw Exception hoặc return false.
+- **Biến `isUnlimitedEnergy`**: Flag cắm cờ cho phép kích hoạt gói Premium.
+
+### Cập Nhật UI Hiển Thị
+- Thêm **Huy hiệu Năng Lượng ⚡** kế bên (hoặc tráo chỗ) màn hình `MainWrapper` (Thanh bar có số Sao ⭐). Thiết kế góc phải trên cùng.
+- Khi năng lượng bằng 0, chữ số sẽ chuyển xám/đỏ và hiển thị Timer đếm ngược đến lúc hồi ⚡ tiếp theo.
+
+### Tích hợp vào Game Loop (Trừ Năng Lượng)
+Xác định vị trí người dùng làm sai để móc hàm `ProgressService.to.deductEnergy()`:
+#### [MODIFY] `lib/presentation/controllers/memory_match_controller.dart`
+- Trừ ⚡ khi người chơi lật sai thẻ nhớ quá 3 lần, hoặc mỗi lần lật trật thẻ (Tùy độ khó). Tốt nhất là mỗi lần ghép sai đôi thẻ -> mất 1 ⚡.
+- Nếu `energy == 0`, dừng Game ngắt ngang hiển thị Dialog "End of Energy".
+
+#### [MODIFY] `lib/presentation/controllers/listen_find_controller.dart`
+- Nếu nghe và tìm hình sai -> Báo đỏ (Rung lắc) -> Trừ 1 ⚡.
+
+#### [MODIFY] `lib/presentation/controllers/learning_controller.dart`
+- Khi kiểm tra chọn trắc nghiệm/flashcard sai -> Trừ 1 ⚡.
+
+### Màn Hình Cứu Trợ (Out Of Energy Dialog)
+Tạo mới Widget `OutOfEnergyDialog`:
+- Giao diện bật lên khi cố tình bắt đầu chơi hoặc đang chơi mà mất hết ⚡.
+- Tuỳ chọn 1: Xem Quảng Cáo (Reward Video) -> Cộng 1 ⚡.
+- Tuỳ chọn 2: Dùng 100 Sao ⭐ mua 1 ⚡ (Cho user rảnh cày cuốc).
+- Tuỳ chọn VIP: Banner lớn lấp lánh "Đăng ký Plus - Năng lượng vô cực".
+
+## Verification Plan
+### Manual Verification
+1. Xoá data / Chạy app mới, kiểm tra user có đủ 5 ⚡.
+2. Vào màn hình Học thẻ từ vựng hoặc Memory Match, cố tình chọn sai 5 lần.
+3. Chắc chắn UI đếm lùi nhảy về 0 và hất user ra khỏi màn học, hiện Dialog Hết Năng Lượng.
+4. Đóng app, đổi ngày/giờ thiết bị đi tới tương lai 1 tiếng, mở lại app xem ⚡ có được phục hồi chính xác hay không.

@@ -1,0 +1,6 @@
+# Task: Debug Flutter Run on Emulator
+
+- [ ] Reproduce the issue (check process output) <!-- id: 0 -->
+- [ ] Analyze error logs <!-- id: 1 -->
+- [ ] Fix the issue <!-- id: 2 -->
+- [ ] Verify fix <!-- id: 3 -->

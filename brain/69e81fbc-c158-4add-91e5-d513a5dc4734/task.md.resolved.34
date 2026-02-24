@@ -1,0 +1,15 @@
+# Task: Đổi tên Foxy → Maxy
+
+## Đổi tên file (4 file)
+- [/] [foxy_avatar.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/foxy_avatar.dart) → `maxy_avatar.dart`
+- [ ] [foxy_kitchen_screen.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/foxy_kitchen_screen.dart) → `maxy_kitchen_screen.dart`
+- [ ] [foxy_kitchen_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/foxy_kitchen_controller.dart) → `maxy_kitchen_controller.dart`
+- [ ] [foxy_kitchen_binding.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/bindings/foxy_kitchen_binding.dart) → `maxy_kitchen_binding.dart`
+
+## Cập nhật nội dung code (24 file)
+- [ ] Đổi class/variable/string names
+- [ ] Cập nhật import paths
+- [ ] Đổi route names
+- [ ] Đổi UI strings ("Foxy nói" → "Maxy nói")
+- [ ] Đổi puzzle data names
+- [ ] Verify: analyze files

@@ -1,0 +1,60 @@
+# Walkthrough: Tính Năng Streak - Chuỗi Học Tập 🔥
+
+## Tổng Quan
+
+Đã triển khai đầy đủ tính năng **Streak (Chuỗi học tập)** bao gồm: logic trạng thái ngọn lửa, màn hình Streak với animation, lịch tuần, và icon tương tác trên 2 màn hình.
+
+---
+
+## Các File Đã Thay Đổi
+
+### File Mới (3)
+| File | Mô tả |
+|------|--------|
+| [streak_controller.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/controllers/streak_controller.dart) | Controller quản lý data streak, lịch tuần, Foxy messages, celebration audio |
+| [streak_binding.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/bindings/streak_binding.dart) | GetX binding cho StreakController |
+| [streak_screen.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/streak_screen.dart) | UI chính với animated flame, weekly calendar, Foxy message, CTA button |
+
+### File Sửa Đổi (5)
+
+render_diffs(file:///Users/devsang/Developer/App Learn English/lib/core/services/progress_service.dart)
+
+render_diffs(file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/practice_screen.dart)
+
+render_diffs(file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/home_screen.dart)
+
+render_diffs(file:///Users/devsang/Developer/App Learn English/lib/routes/app_routes.dart)
+
+render_diffs(file:///Users/devsang/Developer/App Learn English/lib/routes/app_pages.dart)
+
+---
+
+## Kiến Trúc Tính Năng
+
+```mermaid
+graph TD
+    A["ProgressService"] -->|isStreakActiveToday| B["HomeScreen 🔥"]
+    A -->|isStreakActiveToday| C["PracticeScreen 🔥"]
+    A -->|dailyStreak, weeklyDays| D["StreakController"]
+    D --> E["StreakScreen"]
+    B -->|tap| E
+    C -->|tap + Hero| E
+    E -->|CTA| F["MainWrapper / Home"]
+    G["Lesson Complete / Mini Game"] -->|updateStreakAndPuzzle| A
+```
+
+---
+
+## Logic Trạng Thái
+
+| Trạng thái | Điều kiện | Icon |
+|------------|-----------|------|
+| **Tắt lửa** (Inactive) | Chưa học hôm nay | 🔥 xám |
+| **Thắp lửa** (Active) | Đã hoàn thành 1 bài/game | 🔥 cam rực + glow |
+| **Reset** | Bỏ lỡ > 1 ngày | streakCount = 0 |
+
+---
+
+## Verification
+
+✅ `flutter analyze` — **0 errors** trên tất cả 8 files

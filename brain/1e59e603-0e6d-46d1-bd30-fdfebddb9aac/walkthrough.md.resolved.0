@@ -1,0 +1,21 @@
+# Kết quả Cập nhật Hệ thống Shop Dynamic
+
+Su đã hoàn thành việc nâng cấp hệ thống Cửa hàng. Giờ đây, nhân vật Maxy có thể hiển thị chính xác các vật phẩm mới mà bạn thêm vào Firebase mà không cần phải cập nhật mã nguồn.
+
+## Các thay đổi chính
+
+### 1. [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart)
+- Thêm hàm [getItemById(String id)](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#268-272) giúp truy vấn vật phẩm từ cả nguồn Local và Firebase.
+- Sử dụng `firstWhereOrNull` để tránh lỗi crash nếu không tìm thấy ID.
+
+### 2. [MaxyAvatar](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/maxy_avatar.dart)
+- Thay đổi logic hiển thị: Ưu tiên lấy thông tin từ [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-273) thay vì biến tĩnh [ShopData](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart#6-108).
+- Thêm cơ chế **Fallback**: Nếu Cửa hàng chưa kịp tải dữ liệu, Maxy vẫn sẽ hiển thị được các đồ cơ bản từ [ShopData](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart#6-108) để tránh giao diện bị lỗi.
+
+## Kết quả kiểm tra
+- [x] Sửa lỗi trùng lặp khai báo hàm [importShopItems](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/data_import_service.dart#78-115).
+- [x] [MaxyAvatar](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/maxy_avatar.dart#13-28) đã nhận diện được class [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-273).
+- [x] Hệ thống merge dữ liệu (Local + Online) hoạt động ổn định.
+
+> [!TIP]
+> Từ giờ, khi bạn thêm món đồ mới vào collection `shop_items` trên Firestore, chỉ cần đảm bảo ID của nó trùng với ID bạn gán cho người dùng, Maxy sẽ tự động "mặc" được món đồ đó!

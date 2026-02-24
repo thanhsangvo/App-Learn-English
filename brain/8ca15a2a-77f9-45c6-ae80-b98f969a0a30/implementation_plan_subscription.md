@@ -1,0 +1,32 @@
+# Kế Hoạch Triển Khai: Subscription "Super Maxy" qua RevenueCat
+
+Mục tiêu là xây dựng hệ thống In-App Purchase định kỳ (Subscription) thông qua **RevenueCat** kết hợp với **Nâng Cấp Ngữ Cảnh (Contextual Upsell)** cho ứng dụng App Learn English. 
+
+Chúng ta thống nhất áp dụng **Option C**: Duy nhất 1 gói "Super Maxy" bao trọn quyền lợi (Vô cực năng lượng, Không quảng cáo, Thi không cần Mở khóa, x2 Sao).
+
+## 1. Cài Đặt và Cấu Hình Cơ Bản
+- **Thư viện:** Thêm gói `purchases_flutter` vào `pubspec.yaml`
+- **Khởi tạo:** Tạo mới file `lib/core/services/revenuecat_service.dart`.
+- **Cấu hình RevenueCat:** 
+   - Khởi tạo SDK trong `main.dart` với Public API Key từ RevenueCat.
+   - Viết các hàm `fetchOffers()`, `purchasePackage()`, và `checkSubscriptionStatus()`.
+
+## 2. Quản Lý Trạng Thái VIP
+- **Biến trạng thái toàn cục:** Cập nhật `ProgressService` hoặc thêm biến observable `isSuperMaxy` (bool) vào thẳng `RevenueCatService`. Lắng nghe Customer Info stream để tự động thay đổi trạng thái.
+
+## 3. Chức Năng Cốt Lõi Của "Super Maxy"
+- **Không Giới Hạn Năng Lượng:** Sửa hàm trừ năng lượng trong các game chơi (VD: `learning_controller.dart`, `memory_match_controller.dart`, `listen_find_controller.dart`). Nếu `isSuperMaxy == true`, không trừ năng lượng.
+- **Không Quảng Cáo:** Ngăn kích hoạt luồng `adService` khi bài học kết thúc trong `learning_controller.dart` nếu người dùng là VIP.
+- **x2 Ngôi Sao:** Chỉnh sửa logic hàm thưởng Sao cuối mỗi bài học. Nếu `isSuperMaxy`, nhân đổi số Sao cơ bản trước khi cộng vào `ProgressService`.
+- **Mở khóa Toàn Bộ Topic:** Ở màn hình hiển thị danh sách Topic (`level_selection_dialog.dart` hoặc nơi chọn bài), vô hiệu hóa icon Ổ Khóa và logic chặng đường nếu người dùng là VIP (hoặc cho phép click vào kể cả khi `isUnlocked` là false).
+
+## 4. Giao Diện & Upsell Ngữ Cảnh (Paywall)
+Tạo UI chung cho Paywall tại `lib/presentation/widgets/paywall_dialog.dart`, sau đó gọi ở các điểm chạm sau:
+1. **Trong mục Hồ Sơ (Trang cá nhân):** Một nút/banner "Nâng cấp Super Maxy".
+2. **Ngữ Cảnh 1 - Hết Năng Lượng:** Thay vì chỉ hiện popup "Sạc Năng Lượng bằng Ads/Tiền", thêm Nút To Nhất là "Mua Gói Vô Hạn Năng Lượng".
+3. **Ngữ Cảnh 2 - Nhấp vào bài học bị khóa:** Khi bé bấm nhầm vào Topic chưa mở khóa, thay vì chỉ hiện dòng chữ "Hãy hoàn thành bài học trước", một popup xổ lên: "Khám phá ngay bài học này với Super Maxy!".
+
+## Verification Plan
+1. Chạy trên máy ảo/máy thật để test `purchases_flutter` với tài khoản Sandbox (Apple/Google).
+2. Ấn Mua Thành Công -> UI tự động chuyển sang chế độ VIP (mở khoá bài, x2 sao hiển thị, mất nút quảng cáo).
+3. Đóng mở luồng trả phí để kiểm tra xem RevenueCat Cache có hoạt động (người dùng vẫn là VIP khi offline không?).

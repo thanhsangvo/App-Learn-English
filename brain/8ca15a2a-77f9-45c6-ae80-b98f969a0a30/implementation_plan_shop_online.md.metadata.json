@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Implementation plan for migrating shop items to Firebase Firestore with local caching and offset config.",
+  "updatedAt":  "2026-02-23T14:45:57.709990Z"
+}

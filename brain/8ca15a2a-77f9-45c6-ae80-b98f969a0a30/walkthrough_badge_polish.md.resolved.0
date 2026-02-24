@@ -1,0 +1,3003 @@
+# Walkthrough - Unifying Badge UI (Pro Max)
+
+Tôi đã hoàn tất việc đồng nhất giao diện các badge (Năng lượng ⚡ và Điểm số ⭐) trên toàn bộ các màn hình học tập, đảm bảo phong cách premium "Pro Max" và loại bỏ hiện tượng nhảy layout khi giá trị thay đổi.
+
+## 🌟 Các thay đổi chính
+
+### 1. Đồng nhất Energy & Score Badge
+- Cập nhật [EnergyBadge](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/energy_badge.dart#7-117) và tạo mới [ScoreBadge](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/score_badge.dart#5-47) với thiết kế giống hệt nhau: Nền trắng, viền vàng (shades of yellow), shadow nhẹ, bo góc mềm mại.
+- Sử dụng font `Quicksand` đậm cho con số để tăng độ cao cấp.
+- Cố định chiều rộng tối thiểu (minWidth) cho cả hai badge để ngăn UI bị giật khi số tăng/giảm.
+
+### 2. Cập nhật các màn hình học tập
+Toàn bộ các màn hình sau đã được cập nhật để sử dụng bộ badge mới:
+- **[LearningScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/learning_screen.dart#15-407)**: Học từ vựng với Flashcards.
+- **[ListenFindScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/listen_find_screen.dart#14-263)**: Nghe và tìm từ đúng.
+- **[MemoryMatchScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/memory_match_screen.dart#13-208)**: Game lật thẻ bài.
+- **[SpeechPracticeScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/speech_practice_screen.dart#14-438)**: Luyện phát âm.
+
+## 🛠 Chi tiết kỹ thuật
+
+### Đã sửa lỗi:
+- Loại bỏ hiện tượng nhảy layout do thay đổi chiều rộng widget khi con số thay đổi.
+- Dọn dẹp code, xóa bỏ các import thừa và đồng nhất logic hiển thị.
+- Đảm bảo tính ổn định của build với việc khôi phục các dependency quan trọng.
+
+## 📸 Kết quả hình ảnh
+
+````carousel
+![Energy Badge Polished](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/energy_badge.dart)
+<!-- slide -->
+![Score Badge Integration](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/score_badge.dart)
+````
+
+> [!TIP]
+> Hệ thống hiện tại đã rất ổn định và mang lại cảm giác premium đồng nhất. Bạn có thể thử tăng điểm số để thấy layout không còn bị dịch chuyển nữa!
+
+```diff:energy_badge.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/services/progress_service.dart';
+
+class EnergyBadge extends StatelessWidget {
+  const EnergyBadge({super.key});
+
+  void _showEnergyDialog(BuildContext context) {
+    // Tạm thời mở 1 dialog hiển thị thông tin
+    // Lát sau sẽ làm OutOfEnergyDialog có option Mua Gói VIP
+    Get.defaultDialog(
+      title: 'Năng Lượng',
+      titleStyle: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
+      content: const Text(
+        'Mỗi khi làm sai bạn sẽ mất 1 ⚡.\\nHồi phục 1 ⚡ cần 20 phút.',
+      ),
+      confirm: ElevatedButton(
+        onPressed: () => Get.back(),
+        child: const Text('Đã hiểu'),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progressService = Get.find<ProgressService>();
+
+    return GestureDetector(
+      onTap: () => _showEnergyDialog(context),
+      child: Obx(() {
+        final currentEnergy = progressService.currentEnergy.value;
+        final timeUntilNext = progressService.timeUntilNextEnergy.value;
+        final isUnlimited = progressService.isUnlimitedEnergy.value;
+
+        // Nếu năng lượng cạn, viền đổi thành xám/đỏ
+        final isEmpty = currentEnergy == 0 && !isUnlimited;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isEmpty ? Colors.grey.shade400 : Colors.yellow.shade400,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '⚡',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isEmpty
+                      ? null
+                      : null, // Emoji doesn't tint easily this way, but we can grayscale if wanted
+                ),
+              ),
+              if (isEmpty)
+                ColorFiltered(
+                  colorFilter: const ColorFilter.matrix([
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                  ]),
+                  child: const Text(
+                    '⚡',
+                    style: TextStyle(fontSize: 16),
+                  ), // Overlapping trick if we want, or just let it be normally colored since ⚡ is yellow
+                ),
+              const SizedBox(width: 4),
+
+              if (isUnlimited)
+                Text(
+                  '∞',
+                  style: GoogleFonts.quicksand(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade600,
+                  ),
+                )
+              else if (currentEnergy < ProgressService.maxEnergy &&
+                  timeUntilNext.isNotEmpty)
+                // Đang hồi năng lượng
+                Row(
+                  children: [
+                    Text(
+                      '$currentEnergy',
+                      style: GoogleFonts.quicksand(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isEmpty ? Colors.grey : Colors.blue.shade600,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      timeUntilNext,
+                      style: GoogleFonts.quicksand(
+                        fontSize: 12,
+                        color: Colors.orange.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                // Đầy năng lượng
+                Text(
+                  '$currentEnergy',
+                  style: GoogleFonts.quicksand(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade600,
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+}
+===
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/services/progress_service.dart';
+
+class EnergyBadge extends StatelessWidget {
+  const EnergyBadge({super.key});
+
+  void _showEnergyDialog(BuildContext context) {
+    // Tạm thời mở 1 dialog hiển thị thông tin
+    // Lát sau sẽ làm OutOfEnergyDialog có option Mua Gói VIP
+    Get.defaultDialog(
+      title: 'Năng Lượng',
+      titleStyle: GoogleFonts.quicksand(fontWeight: FontWeight.bold),
+      content: const Text(
+        'Mỗi khi làm sai bạn sẽ mất 1 ⚡.\nHồi phục 1 ⚡ cần 20 phút.',
+        textAlign: TextAlign.center,
+      ),
+      confirm: ElevatedButton(
+        onPressed: () => Get.back(),
+        child: const Text('Đã hiểu'),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progressService = Get.find<ProgressService>();
+
+    return GestureDetector(
+      onTap: () => _showEnergyDialog(context),
+      child: Obx(() {
+        final currentEnergy = progressService.currentEnergy.value;
+        final timeUntilNext = progressService.timeUntilNextEnergy.value;
+        final isUnlimited = progressService.isUnlimitedEnergy.value;
+
+        // Nếu năng lượng cạn, viền đổi thành xám/đỏ
+        final isEmpty = currentEnergy == 0 && !isUnlimited;
+
+        return Container(
+          constraints: const BoxConstraints(minWidth: 85),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isEmpty ? Colors.grey.shade400 : Colors.yellow.shade400,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('⚡', style: TextStyle(fontSize: 14)),
+              const SizedBox(width: 4),
+
+              if (isUnlimited)
+                Text(
+                  '∞',
+                  style: GoogleFonts.quicksand(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlue,
+                  ),
+                )
+              else if (currentEnergy < ProgressService.maxEnergy &&
+                  timeUntilNext.isNotEmpty)
+                // Đang hồi năng lượng
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '$currentEnergy',
+                      style: GoogleFonts.quicksand(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isEmpty ? Colors.grey : AppColors.primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      timeUntilNext,
+                      style: GoogleFonts.quicksand(
+                        fontSize: 11,
+                        color: Colors.orange.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                )
+              else
+                // Đầy năng lượng
+                Text(
+                  '$currentEnergy',
+                  style: GoogleFonts.quicksand(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryBlue,
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+}
+```
+```diff:score_badge.dart
+===
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../core/theme/app_colors.dart';
+
+class ScoreBadge extends StatelessWidget {
+  final String score;
+  final double minWidth;
+
+  const ScoreBadge({super.key, required this.score, this.minWidth = 75});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints(minWidth: minWidth),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.yellow.shade400, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text('⭐', style: TextStyle(fontSize: 14)),
+          const SizedBox(width: 4),
+          Text(
+            score,
+            style: GoogleFonts.quicksand(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: AppColors.sunnyYellow,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+```diff:learning_screen.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/fun_button.dart';
+import '../../core/widgets/glass_card.dart';
+import '../../core/utils/haptic_helper.dart';
+import '../controllers/learning_controller.dart';
+import '../widgets/animated_flashcard.dart';
+import '../widgets/answer_option.dart';
+import 'dart:math';
+
+/// Learning Screen - Màn hình học từ vựng với Flashcard
+class LearningScreen extends GetView<LearningController> {
+  const LearningScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
+        final bool shouldPop = await _showExitConfirmDialog(context) ?? false;
+        if (shouldPop) {
+          Get.back();
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // Header với nút back và progress
+                    _buildHeader(context),
+
+                    const SizedBox(height: 20),
+
+                    // Flashcard chính
+                    Expanded(flex: 3, child: _buildFlashcard()),
+
+                    const SizedBox(height: 20),
+
+                    // Hướng dẫn
+                    _buildInstruction(),
+
+                    const SizedBox(height: 16),
+
+                    // 3 đáp án để chọn
+                    Expanded(flex: 2, child: _buildAnswerOptions()),
+
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Hiển thị popup xác nhận thoát
+  Future<bool?> _showExitConfirmDialog(BuildContext context) {
+    HapticHelper.heavyImpact();
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return const SizedBox.shrink(); // Use transitionBuilder instead
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.elasticOut),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Maxy Icon with bouncing
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: 2),
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                          0,
+                          -10 * (1 - sin(value * 4 * pi).abs()),
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: const Text('🦊', style: TextStyle(fontSize: 64)),
+                    onEnd: () {
+                      // Optionally loop the animation outside builder if needed
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Tiêu đề
+                  Text(
+                    'Chờ đã bé ơi! 🦊',
+                    style: AppTextStyles.heading2.copyWith(
+                      color: AppColors.primaryBlue,
+                      fontSize: 24,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Phụ đề (Gamified)
+                  Obx(() {
+                    final int completed = controller.currentIndex.value;
+                    final int total = controller.vocabularies.length;
+                    return Text(
+                      'Bé đã học được $completed/$total từ rồi, ráng lên nào!\nNếu thoát bây giờ tiến trình sẽ không được lưu đâu nhé.',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  }),
+
+                  const SizedBox(height: 32),
+
+                  // Nút 1: Học tiếp thôi (Primary)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        HapticHelper.lightImpact();
+                        Navigator.of(context).pop(false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.mintGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        'Học tiếp thôi!',
+                        style: AppTextStyles.heading3.copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Nút 2: Thoát (Secondary/Text)
+                  TextButton(
+                    onPressed: () {
+                      HapticHelper.lightImpact();
+                      Navigator.of(context).pop(true);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.textSecondary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Thoát bài học',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.coralPink.withOpacity(0.7),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Header với back button và progress bar
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          // Back button
+          GestureDetector(
+            onTap: () async {
+              HapticHelper.lightImpact();
+              final bool shouldPop =
+                  await _showExitConfirmDialog(context) ?? false;
+              if (shouldPop) {
+                Get.back();
+              }
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Progress bar
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Obx(
+                  () => Text(
+                    controller.currentTopic.name,
+                    style: AppTextStyles.heading3,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Obx(() => _buildProgressBar(controller.progress)),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Score
+          GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            borderRadius: 20,
+            child: Obx(
+              () => Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('⭐', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${controller.score}',
+                    style: AppTextStyles.buttonLarge.copyWith(
+                      color: AppColors.sunnyYellow,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Progress bar với animation
+  Widget _buildProgressBar(double progress) {
+    return Container(
+      height: 12,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Stack(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutCubic,
+            width: progress * (Get.width - 150),
+            height: 12,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppColors.mintGreen, AppColors.sunnyYellow],
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mintGreen.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Flashcard widget
+  Widget _buildFlashcard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Obx(
+        () => AnimatedFlashcard(
+          vocabulary: controller.currentVocabulary,
+          isBouncing: controller.isFlashcardBouncing.value,
+          onTap: controller.onFlashcardTap,
+        ),
+      ),
+    );
+  }
+
+  /// Hướng dẫn cho bé
+  Widget _buildInstruction() {
+    return Obx(() {
+      if (controller.hasAnswered.value) {
+        return controller.isCorrect.value
+            ? Text(
+                '🎉 Tuyệt vời! Đúng rồi!',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.success,
+                ),
+              )
+            : Column(
+                children: [
+                  Text(
+                    '😊 Thử lại nhé!',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.coralPink,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FunButton(
+                    text: 'Thử lại',
+                    icon: Icons.refresh_rounded,
+                    onPressed: controller.retryCurrentWord,
+                    backgroundColor: AppColors.coralPink,
+                    height: 50,
+                    width: 150,
+                  ),
+                ],
+              );
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.volume_up_rounded, color: AppColors.mintGreen, size: 20),
+          const SizedBox(width: 6),
+          Text(
+            'Chạm vào thẻ để nghe lại',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  /// 3 lựa chọn đáp án
+  Widget _buildAnswerOptions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Obx(
+        () => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(controller.answerOptions.length, (index) {
+            final vocab = controller.answerOptions[index];
+            final isSelected = controller.selectedAnswer.value == index;
+            final isCorrectAnswer = vocab.id == controller.currentVocabulary.id;
+            final showResult = controller.hasAnswered.value;
+
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: AnswerOption(
+                  vocabulary: vocab,
+                  isSelected: isSelected,
+                  isCorrect: showResult && isCorrectAnswer,
+                  isWrong: showResult && isSelected && !isCorrectAnswer,
+                  onTap: () => controller.onAnswerSelected(index),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+===
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/fun_button.dart';
+import '../../core/utils/haptic_helper.dart';
+import '../controllers/learning_controller.dart';
+import '../widgets/animated_flashcard.dart';
+import '../widgets/answer_option.dart';
+import '../widgets/energy_badge.dart';
+import '../widgets/score_badge.dart';
+import 'dart:math';
+
+/// Learning Screen - Màn hình học từ vựng với Flashcard
+class LearningScreen extends GetView<LearningController> {
+  const LearningScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) return;
+        final bool shouldPop = await _showExitConfirmDialog(context) ?? false;
+        if (shouldPop) {
+          Get.back();
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    // Header với nút back và progress
+                    _buildHeader(context),
+
+                    const SizedBox(height: 20),
+
+                    // Flashcard chính
+                    Expanded(flex: 3, child: _buildFlashcard()),
+
+                    const SizedBox(height: 20),
+
+                    // Hướng dẫn
+                    _buildInstruction(),
+
+                    const SizedBox(height: 16),
+
+                    // 3 đáp án để chọn
+                    Expanded(flex: 2, child: _buildAnswerOptions()),
+
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Hiển thị popup xác nhận thoát
+  Future<bool?> _showExitConfirmDialog(BuildContext context) {
+    HapticHelper.heavyImpact();
+    return showGeneralDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, anim1, anim2) {
+        return const SizedBox.shrink(); // Use transitionBuilder instead
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(parent: anim1, curve: Curves.elasticOut),
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Maxy Icon with bouncing
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(seconds: 2),
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(
+                          0,
+                          -10 * (1 - sin(value * 4 * pi).abs()),
+                        ),
+                        child: child,
+                      );
+                    },
+                    child: const Text('🦊', style: TextStyle(fontSize: 64)),
+                    onEnd: () {
+                      // Optionally loop the animation outside builder if needed
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Tiêu đề
+                  Text(
+                    'Chờ đã bé ơi! 🦊',
+                    style: AppTextStyles.heading2.copyWith(
+                      color: AppColors.primaryBlue,
+                      fontSize: 24,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Phụ đề (Gamified)
+                  Obx(() {
+                    final int completed = controller.currentIndex.value;
+                    final int total = controller.vocabularies.length;
+                    return Text(
+                      'Bé đã học được $completed/$total từ rồi, ráng lên nào!\nNếu thoát bây giờ tiến trình sẽ không được lưu đâu nhé.',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    );
+                  }),
+
+                  const SizedBox(height: 32),
+
+                  // Nút 1: Học tiếp thôi (Primary)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        HapticHelper.lightImpact();
+                        Navigator.of(context).pop(false);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.mintGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: Text(
+                        'Học tiếp thôi!',
+                        style: AppTextStyles.heading3.copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Nút 2: Thoát (Secondary/Text)
+                  TextButton(
+                    onPressed: () {
+                      HapticHelper.lightImpact();
+                      Navigator.of(context).pop(true);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.textSecondary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Thoát bài học',
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.coralPink.withOpacity(0.7),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Header với back button và progress bar
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          // Back button
+          GestureDetector(
+            onTap: () async {
+              HapticHelper.lightImpact();
+              final bool shouldPop =
+                  await _showExitConfirmDialog(context) ?? false;
+              if (shouldPop) {
+                Get.back();
+              }
+            },
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowColor.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Progress bar
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Obx(
+                  () => Text(
+                    controller.currentTopic.name,
+                    style: AppTextStyles.heading3,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Obx(() => _buildProgressBar(controller.progress)),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          // Energy Badge
+          const EnergyBadge(),
+
+          const SizedBox(width: 12),
+
+          // Score
+          Obx(() => ScoreBadge(score: '${controller.score}')),
+        ],
+      ),
+    );
+  }
+
+  /// Progress bar với animation
+  Widget _buildProgressBar(double progress) {
+    return Container(
+      height: 12,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Stack(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeOutCubic,
+            width: progress * (Get.width - 150),
+            height: 12,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [AppColors.mintGreen, AppColors.sunnyYellow],
+              ),
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.mintGreen.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Flashcard widget
+  Widget _buildFlashcard() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Obx(
+        () => AnimatedFlashcard(
+          vocabulary: controller.currentVocabulary,
+          isBouncing: controller.isFlashcardBouncing.value,
+          onTap: controller.onFlashcardTap,
+        ),
+      ),
+    );
+  }
+
+  /// Hướng dẫn cho bé
+  Widget _buildInstruction() {
+    return Obx(() {
+      if (controller.hasAnswered.value) {
+        return controller.isCorrect.value
+            ? Text(
+                '🎉 Tuyệt vời! Đúng rồi!',
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: AppColors.success,
+                ),
+              )
+            : Column(
+                children: [
+                  Text(
+                    '😊 Thử lại nhé!',
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      color: AppColors.coralPink,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FunButton(
+                    text: 'Thử lại',
+                    icon: Icons.refresh_rounded,
+                    onPressed: controller.retryCurrentWord,
+                    backgroundColor: AppColors.coralPink,
+                    height: 50,
+                    width: 150,
+                  ),
+                ],
+              );
+      }
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.volume_up_rounded, color: AppColors.mintGreen, size: 20),
+          const SizedBox(width: 6),
+          Text(
+            'Chạm vào thẻ để nghe lại',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  /// 3 lựa chọn đáp án
+  Widget _buildAnswerOptions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Obx(
+        () => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(controller.answerOptions.length, (index) {
+            final vocab = controller.answerOptions[index];
+            final isSelected = controller.selectedAnswer.value == index;
+            final isCorrectAnswer = vocab.id == controller.currentVocabulary.id;
+            final showResult = controller.hasAnswered.value;
+
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: AnswerOption(
+                  vocabulary: vocab,
+                  isSelected: isSelected,
+                  isCorrect: showResult && isCorrectAnswer,
+                  isWrong: showResult && isSelected && !isCorrectAnswer,
+                  onTap: () => controller.onAnswerSelected(index),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+```
+```diff:listen_find_screen.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/fun_button.dart';
+import '../../core/widgets/glass_card.dart';
+import '../controllers/listen_find_controller.dart';
+import '../../data/models/topic_model.dart'; // For VocabularyModel
+import '../widgets/smart_image.dart';
+
+class ListenFindScreen extends GetView<ListenFindController> {
+  const ListenFindScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.pastelBlue.withOpacity(0.3),
+              AppColors.pastelUnknown.withOpacity(0.3),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 20),
+              _buildSpeakerButton(),
+              const Spacer(),
+              _buildOptionsGrid(),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: Column(
+        children: [
+          // Top Row: Back Button + Score
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              GlassCard(
+                borderRadius: 20,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
+                child: Obx(
+                  () => Row(
+                    children: [
+                      const Icon(
+                        Icons.star_rounded,
+                        color: AppColors.sunnyYellow,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${controller.currentQuestionIndex.value}/${controller.maxQuestions}',
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.textPrimary,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Progress Bar (Left to Right)
+          // Designed with "Pro Max" Glassmorphism + Gradient
+          // Progress Bar (Left to Right)
+          // Designed with "Pro Max" Glassmorphism + Gradient
+          Stack(
+            children: [
+              // Background track
+              Container(
+                height: 16,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+              ),
+              // Fill
+              Obx(() {
+                // Fix: Access observable OUTSIDE LayoutBuilder
+                final progress =
+                    (controller.currentQuestionIndex.value /
+                            controller.maxQuestions)
+                        .clamp(0.0, 1.0);
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutQuart,
+                      width: constraints.maxWidth * progress,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.pastelBlue,
+                            AppColors.pastelPurple,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.pastelBlue.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Lives (Hearts) - Positioned BELOW Progress Bar
+          // Centered with nice styling
+          Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                final isActive = index < controller.lives.value;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: AnimatedScale(
+                    scale: isActive ? 1.0 : 0.9,
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      isActive ? Icons.favorite_rounded : Icons.favorite_border,
+                      color: isActive
+                          ? AppColors.coralPink
+                          : AppColors.textSecondary.withValues(alpha: 0.3),
+                      size: 36,
+                      shadows: isActive
+                          ? [
+                              BoxShadow(
+                                color: AppColors.coralPink.withValues(
+                                  alpha: 0.4,
+                                ),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpeakerButton() {
+    return Center(
+      child: Pulse(
+        infinite: true,
+        child: FunButton(
+          onPressed: controller.playCurrentWord,
+          text: '',
+          width: 120,
+          height: 120,
+          color: AppColors.primaryMint,
+          child: const Icon(
+            Icons.volume_up_rounded,
+            size: 60,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionsGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Obx(() {
+        if (controller.options.isEmpty) return const SizedBox();
+
+        return MasonryGridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          itemCount: controller.options.length,
+          itemBuilder: (context, index) {
+            final word = controller.options[index];
+            return _buildOptionCard(word, index);
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _buildOptionCard(VocabularyModel word, int index) {
+    return Obx(() {
+      final state = controller.optionStates[index] ?? 'neutral';
+      Color borderColor = Colors.white;
+      if (state == 'correct') borderColor = Colors.green;
+      if (state == 'wrong') borderColor = Colors.red;
+
+      Widget card = GestureDetector(
+        onTap: () => controller.checkAnswer(word, index),
+        child: GlassCard(
+          padding: const EdgeInsets.all(16),
+          borderColor: borderColor.withOpacity(0.5),
+          child: Column(
+            children: [
+              SmartImage(emoji: word.emoji, height: 100, fit: BoxFit.contain),
+            ],
+          ),
+        ),
+      );
+
+      if (state == 'wrong') {
+        return ShakeY(duration: const Duration(milliseconds: 500), child: card);
+      } else if (state == 'correct') {
+        return Bounce(duration: const Duration(milliseconds: 500), child: card);
+      }
+
+      return card;
+    });
+  }
+}
+===
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/widgets/fun_button.dart';
+import '../../core/widgets/glass_card.dart';
+import '../controllers/listen_find_controller.dart';
+import '../../data/models/topic_model.dart';
+import '../widgets/smart_image.dart';
+import '../widgets/energy_badge.dart';
+import '../widgets/score_badge.dart';
+
+class ListenFindScreen extends GetView<ListenFindController> {
+  const ListenFindScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.pastelBlue.withOpacity(0.3),
+              AppColors.pastelUnknown.withOpacity(0.3),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 20),
+              _buildSpeakerButton(),
+              const Spacer(),
+              _buildOptionsGrid(),
+              const Spacer(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: Column(
+        children: [
+          // Top Row: Back Button + Score
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const EnergyBadge(),
+              const SizedBox(width: 8),
+              Obx(
+                () => ScoreBadge(
+                  score:
+                      '${controller.currentQuestionIndex.value}/${controller.maxQuestions}',
+                  minWidth: 90,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Progress Bar (Left to Right)
+          // Designed with "Pro Max" Glassmorphism + Gradient
+          // Progress Bar (Left to Right)
+          // Designed with "Pro Max" Glassmorphism + Gradient
+          Stack(
+            children: [
+              // Background track
+              Container(
+                height: 16,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+              ),
+              // Fill
+              Obx(() {
+                // Fix: Access observable OUTSIDE LayoutBuilder
+                final progress =
+                    (controller.currentQuestionIndex.value /
+                            controller.maxQuestions)
+                        .clamp(0.0, 1.0);
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutQuart,
+                      width: constraints.maxWidth * progress,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [
+                            AppColors.pastelBlue,
+                            AppColors.pastelPurple,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.pastelBlue.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              }),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Lives (Hearts) - Positioned BELOW Progress Bar
+          // Centered with nice styling
+          Obx(
+            () => Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                final isActive = index < controller.lives.value;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: AnimatedScale(
+                    scale: isActive ? 1.0 : 0.9,
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      isActive ? Icons.favorite_rounded : Icons.favorite_border,
+                      color: isActive
+                          ? AppColors.coralPink
+                          : AppColors.textSecondary.withValues(alpha: 0.3),
+                      size: 36,
+                      shadows: isActive
+                          ? [
+                              BoxShadow(
+                                color: AppColors.coralPink.withValues(
+                                  alpha: 0.4,
+                                ),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpeakerButton() {
+    return Center(
+      child: Pulse(
+        infinite: true,
+        child: FunButton(
+          onPressed: controller.playCurrentWord,
+          text: '',
+          width: 120,
+          height: 120,
+          color: AppColors.primaryMint,
+          child: const Icon(
+            Icons.volume_up_rounded,
+            size: 60,
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionsGrid() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Obx(() {
+        if (controller.options.isEmpty) return const SizedBox();
+
+        return MasonryGridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          itemCount: controller.options.length,
+          itemBuilder: (context, index) {
+            final word = controller.options[index];
+            return _buildOptionCard(word, index);
+          },
+        );
+      }),
+    );
+  }
+
+  Widget _buildOptionCard(VocabularyModel word, int index) {
+    return Obx(() {
+      final state = controller.optionStates[index] ?? 'neutral';
+      Color borderColor = Colors.white;
+      if (state == 'correct') borderColor = Colors.green;
+      if (state == 'wrong') borderColor = Colors.red;
+
+      Widget card = GestureDetector(
+        onTap: () => controller.checkAnswer(word, index),
+        child: GlassCard(
+          padding: const EdgeInsets.all(16),
+          borderColor: borderColor.withOpacity(0.5),
+          child: Column(
+            children: [
+              SmartImage(emoji: word.emoji, height: 100, fit: BoxFit.contain),
+            ],
+          ),
+        ),
+      );
+
+      if (state == 'wrong') {
+        return ShakeY(duration: const Duration(milliseconds: 500), child: card);
+      } else if (state == 'correct') {
+        return Bounce(duration: const Duration(milliseconds: 500), child: card);
+      }
+
+      return card;
+    });
+  }
+}
+```
+```diff:memory_match_screen.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/glass_card.dart';
+import '../controllers/memory_match_controller.dart';
+import '../../data/models/game_level_model.dart';
+import '../../data/models/topic_model.dart';
+import 'dart:math';
+import '../widgets/smart_image.dart';
+
+class MemoryMatchScreen extends GetView<MemoryMatchController> {
+  const MemoryMatchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<MemoryMatchController>()) {
+      // Safety check or lazy put if not bound yet (e.g. direct nav)
+      // Assuming bound by route.
+    }
+
+    // Get arguments if passed, setting level locally if needed or rely on controller default
+    final GameLevel? levelArg = Get.arguments as GameLevel?;
+    if (levelArg != null && controller.currentLevel.value != levelArg) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.startNewGame(levelArg);
+      });
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFE0F7FA), // Light Cyan
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            _buildHeader(),
+            const SizedBox(height: 20),
+
+            // Grid
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Obx(() {
+                  if (controller.cards.isEmpty) return const SizedBox();
+
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: controller.currentLevel.value.cols,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemCount: controller.cards.length,
+                    itemBuilder: (context, index) {
+                      return Obx(() {
+                        final isFlipped =
+                            controller.cardFlips[index] ||
+                            controller.cardMatches[index];
+                        final content = controller.cards[index];
+                        return _buildCard(index, isFlipped, content);
+                      });
+                    },
+                  );
+                }),
+              ),
+            ),
+
+            // Footer
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Obx(
+                () => Text(
+                  'Thời gian: ${controller.timeLeft.value}s',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.coralPink,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          Obx(
+            () => Text(
+              'Mức độ: ${controller.currentLevel.value.name}',
+              style: AppTextStyles.heading3,
+            ),
+          ),
+
+          GlassCard(
+            borderRadius: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Obx(
+              () => Row(
+                children: [
+                  const Icon(
+                    Icons.star_rounded,
+                    color: AppColors.sunnyYellow,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${controller.score.value}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(int index, bool isFlipped, VocabularyModel content) {
+    return GestureDetector(
+      onTap: () => controller.onCardTap(index),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          final rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
+          return AnimatedBuilder(
+            animation: rotateAnim,
+            child: child,
+            builder: (context, child) {
+              final isUnder = (ValueKey(isFlipped) != child!.key);
+              var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.003;
+              tilt *= isUnder ? -1.0 : 1.0;
+              final value = isUnder
+                  ? min(rotateAnim.value, pi / 2)
+                  : rotateAnim.value;
+              return Transform(
+                transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
+                alignment: Alignment.center,
+                child: child,
+              );
+            },
+          );
+        },
+        layoutBuilder: (widget, list) => Stack(children: [widget!, ...list]),
+        switchInCurve: Curves.easeIn,
+        switchOutCurve: Curves.easeIn.flipped,
+        child: isFlipped ? _buildCardFront(content) : _buildCardBack(),
+      ),
+    );
+  }
+
+  Widget _buildCardFront(VocabularyModel content) {
+    return Container(
+      key: const ValueKey(true),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SmartImage(emoji: content.emoji, fit: BoxFit.contain),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardBack() {
+    return Container(
+      key: const ValueKey(false),
+      decoration: BoxDecoration(
+        color: const Color(0xFF74B9FF),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF74B9FF).withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: Icon(Icons.help_outline_rounded, color: Colors.white, size: 40),
+      ),
+    );
+  }
+}
+===
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../controllers/memory_match_controller.dart';
+import '../../data/models/game_level_model.dart';
+import '../../data/models/topic_model.dart';
+import 'dart:math';
+import '../widgets/smart_image.dart';
+import '../widgets/energy_badge.dart';
+import '../widgets/score_badge.dart';
+
+class MemoryMatchScreen extends GetView<MemoryMatchController> {
+  const MemoryMatchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<MemoryMatchController>()) {
+      // Safety check or lazy put if not bound yet (e.g. direct nav)
+      // Assuming bound by route.
+    }
+
+    // Get arguments if passed, setting level locally if needed or rely on controller default
+    final GameLevel? levelArg = Get.arguments as GameLevel?;
+    if (levelArg != null && controller.currentLevel.value != levelArg) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.startNewGame(levelArg);
+      });
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFE0F7FA), // Light Cyan
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header
+            _buildHeader(),
+            const SizedBox(height: 20),
+
+            // Grid
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Obx(() {
+                  if (controller.cards.isEmpty) return const SizedBox();
+
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: controller.currentLevel.value.cols,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemCount: controller.cards.length,
+                    itemBuilder: (context, index) {
+                      return Obx(() {
+                        final isFlipped =
+                            controller.cardFlips[index] ||
+                            controller.cardMatches[index];
+                        final content = controller.cards[index];
+                        return _buildCard(index, isFlipped, content);
+                      });
+                    },
+                  );
+                }),
+              ),
+            ),
+
+            // Footer
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Obx(
+                () => Text(
+                  'Thời gian: ${controller.timeLeft.value}s',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.coralPink,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () => Get.back(),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_back_rounded,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ),
+          Obx(
+            () => Text(
+              'Mức độ: ${controller.currentLevel.value.name}',
+              style: AppTextStyles.heading3,
+            ),
+          ),
+
+          const SizedBox(width: 12),
+          const EnergyBadge(),
+          const SizedBox(width: 8),
+          Obx(
+            () => ScoreBadge(score: '${controller.score.value}', minWidth: 80),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(int index, bool isFlipped, VocabularyModel content) {
+    return GestureDetector(
+      onTap: () => controller.onCardTap(index),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          final rotateAnim = Tween(begin: pi, end: 0.0).animate(animation);
+          return AnimatedBuilder(
+            animation: rotateAnim,
+            child: child,
+            builder: (context, child) {
+              final isUnder = (ValueKey(isFlipped) != child!.key);
+              var tilt = ((animation.value - 0.5).abs() - 0.5) * 0.003;
+              tilt *= isUnder ? -1.0 : 1.0;
+              final value = isUnder
+                  ? min(rotateAnim.value, pi / 2)
+                  : rotateAnim.value;
+              return Transform(
+                transform: Matrix4.rotationY(value)..setEntry(3, 0, tilt),
+                alignment: Alignment.center,
+                child: child,
+              );
+            },
+          );
+        },
+        layoutBuilder: (widget, list) => Stack(children: [widget!, ...list]),
+        switchInCurve: Curves.easeIn,
+        switchOutCurve: Curves.easeIn.flipped,
+        child: isFlipped ? _buildCardFront(content) : _buildCardBack(),
+      ),
+    );
+  }
+
+  Widget _buildCardFront(VocabularyModel content) {
+    return Container(
+      key: const ValueKey(true),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SmartImage(emoji: content.emoji, fit: BoxFit.contain),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCardBack() {
+    return Container(
+      key: const ValueKey(false),
+      decoration: BoxDecoration(
+        color: const Color(0xFF74B9FF),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF74B9FF).withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Center(
+        child: Icon(Icons.help_outline_rounded, color: Colors.white, size: 40),
+      ),
+    );
+  }
+}
+```
+```diff:speech_practice_screen.dart
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/glass_card.dart';
+import '../controllers/speech_practice_controller.dart';
+import '../widgets/animated_mic_button.dart';
+import '../widgets/smart_image.dart';
+import '../widgets/feedback_inline.dart';
+
+class SpeechPracticeScreen extends GetView<SpeechPracticeController> {
+  const SpeechPracticeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFFFF8E1).withOpacity(0.8), // Warm cream
+              const Color(0xFFFFECB3).withOpacity(0.5), // Light amber
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Obx(() {
+                  if (controller.wordList.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return _buildMainContent();
+                }),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============ HEADER ============
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Back button
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+
+              // Title
+              Text(
+                'Tập Nói 🎤',
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
+
+              // Progress badge
+              GlassCard(
+                borderRadius: 20,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Obx(
+                  () => Text(
+                    '${controller.currentIndex.value + 1}/${controller.totalWords}',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Progress bar
+          Obx(() {
+            final progress = controller.progress;
+            return Stack(
+              children: [
+                Container(
+                  height: 12,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutQuart,
+                  height: 12,
+                  width:
+                      (MediaQuery.of(Get.context!).size.width - 48) * progress,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFB347), Color(0xFFFF6B6B)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFB347).withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ============ MAIN CONTENT ============
+
+  Widget _buildMainContent() {
+    return Obx(() {
+      final word = controller.currentWord;
+
+      // Removed Stack. Use Column + Spacer for clean layout.
+      return Column(
+        children: [
+          // Dynamic Spacer or Fixed Height for Feedback Area
+          SizedBox(
+            height: 50, // Dedicated space for feedback
+            child: Obx(() {
+              if (!controller.showFeedback.value)
+                return const SizedBox.shrink();
+
+              final score = controller.lastScore.value;
+              String emoji;
+              String label;
+
+              if (score >= 90) {
+                emoji = '🌟'; // Star handled by widget icon
+                label = 'Xuất sắc!';
+              } else if (score >= 70) {
+                emoji = '👍';
+                label = 'Tốt lắm!';
+              } else if (score >= 50) {
+                emoji = '💪';
+                label = 'Cố gắng!';
+              } else {
+                emoji = '🦊';
+                label = 'Thử lại nhé!';
+              }
+
+              return Center(
+                child: FeedbackInline(
+                  score: score.toInt(),
+                  label: label,
+                  emoji: emoji,
+                ),
+              );
+            }),
+          ),
+
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Word card with image
+                          FadeInDown(
+                            duration: const Duration(milliseconds: 400),
+                            child: _buildWordCard(word),
+                          ),
+                          const SizedBox(height: 24),
+                          // Listen button
+                          _buildListenButton(),
+                          const SizedBox(height: 16),
+                          // Microphone button
+                          _buildMicrophoneButton(),
+                          const SizedBox(height: 8),
+                          // Recognized text display
+                          _buildRecognizedText(),
+                          const SizedBox(height: 32),
+                          // Skip button
+                          _buildSkipButton(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  // ============ WORD CARD ============
+
+  Widget _buildWordCard(dynamic word) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 16,
+      ), // Reduced vertical padding
+      child: Column(
+        children: [
+          // Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SmartImage(
+              emoji: word.emoji,
+              height: 120, // Reduced from 140
+              fit: BoxFit.contain,
+            ),
+          ),
+
+          const SizedBox(height: 12), // Reduced from 16
+          // English word
+          Text(
+            word.word,
+            style: AppTextStyles.heading2.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 30, // Slightly reduced
+              letterSpacing: 1.2,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Vietnamese meaning
+          Text(
+            word.meaning,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============ LISTEN BUTTON ============
+
+  Widget _buildListenButton() {
+    return GestureDetector(
+      onTap: controller.playCurrentWord,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.pastelBlue.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.volume_up_rounded,
+              color: AppColors.pastelBlue,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Nghe phát âm',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.pastelBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============ MICROPHONE BUTTON ============
+
+  Widget _buildMicrophoneButton() {
+    return Obx(() {
+      final listening = controller.isListening.value;
+
+      return AnimatedMicButton(
+        isListening: listening,
+        onTapToggle: () => controller.toggleListening(),
+      );
+    });
+  }
+
+  // ============ RECOGNIZED TEXT ============
+
+  Widget _buildRecognizedText() {
+    return Obx(() {
+      final text = controller.recognizedText.value;
+      final listening = controller.isListening.value;
+
+      if (text.isEmpty && !listening) {
+        return Text(
+          'Nhấn giữ 🎤 để nói',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary.withOpacity(0.6),
+            fontStyle: FontStyle.italic,
+          ),
+        );
+      }
+
+      if (listening && text.isEmpty) {
+        return Pulse(
+          infinite: true,
+          child: Text(
+            '🎧 Đang nghe...',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: const Color(0xFFFF6B6B),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          '"$text"',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    });
+  }
+
+  // ============ SCORE FEEDBACK (REMOVED - MOVED TO FLOATING PILL) ============
+  // Widget _buildScoreFeedback() {}
+
+  // ============ SKIP BUTTON ============
+
+  Widget _buildSkipButton() {
+    return TextButton(
+      onPressed: controller.skipWord,
+      child: Text(
+        'Bỏ qua ›',
+        style: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.textSecondary.withOpacity(0.5),
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+}
+===
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
+import '../../core/widgets/glass_card.dart';
+import '../controllers/speech_practice_controller.dart';
+import '../widgets/animated_mic_button.dart';
+import '../widgets/smart_image.dart';
+import '../widgets/feedback_inline.dart';
+import '../widgets/energy_badge.dart';
+
+class SpeechPracticeScreen extends GetView<SpeechPracticeController> {
+  const SpeechPracticeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              const Color(0xFFFFF8E1).withOpacity(0.8), // Warm cream
+              const Color(0xFFFFECB3).withOpacity(0.5), // Light amber
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Obx(() {
+                  if (controller.wordList.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return _buildMainContent();
+                }),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ============ HEADER ============
+
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Back button
+              GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_rounded,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+
+              // Title
+              Text(
+                'Tập Nói 🎤',
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
+
+              // Energy + Progress badge
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const EnergyBadge(),
+                  const SizedBox(width: 8),
+                  // Progress Badge (Styled like ScoreBadge)
+                  Container(
+                    constraints: const BoxConstraints(minWidth: 75),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.yellow.shade400,
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Obx(
+                        () => Text(
+                          '${controller.currentIndex.value + 1}/${controller.totalWords}',
+                          style: GoogleFonts.quicksand(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.sunnyYellow,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Progress bar
+          Obx(() {
+            final progress = controller.progress;
+            return Stack(
+              children: [
+                Container(
+                  height: 12,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutQuart,
+                  height: 12,
+                  width:
+                      (MediaQuery.of(Get.context!).size.width - 48) * progress,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFB347), Color(0xFFFF6B6B)],
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFB347).withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ============ MAIN CONTENT ============
+
+  Widget _buildMainContent() {
+    return Obx(() {
+      final word = controller.currentWord;
+
+      // Removed Stack. Use Column + Spacer for clean layout.
+      return Column(
+        children: [
+          // Dynamic Spacer or Fixed Height for Feedback Area
+          SizedBox(
+            height: 50, // Dedicated space for feedback
+            child: Obx(() {
+              if (!controller.showFeedback.value)
+                return const SizedBox.shrink();
+
+              final score = controller.lastScore.value;
+              String emoji;
+              String label;
+
+              if (score >= 90) {
+                emoji = '🌟'; // Star handled by widget icon
+                label = 'Xuất sắc!';
+              } else if (score >= 70) {
+                emoji = '👍';
+                label = 'Tốt lắm!';
+              } else if (score >= 50) {
+                emoji = '💪';
+                label = 'Cố gắng!';
+              } else {
+                emoji = '🦊';
+                label = 'Thử lại nhé!';
+              }
+
+              return Center(
+                child: FeedbackInline(
+                  score: score.toInt(),
+                  label: label,
+                  emoji: emoji,
+                ),
+              );
+            }),
+          ),
+
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Word card with image
+                          FadeInDown(
+                            duration: const Duration(milliseconds: 400),
+                            child: _buildWordCard(word),
+                          ),
+                          const SizedBox(height: 24),
+                          // Listen button
+                          _buildListenButton(),
+                          const SizedBox(height: 16),
+                          // Microphone button
+                          _buildMicrophoneButton(),
+                          const SizedBox(height: 8),
+                          // Recognized text display
+                          _buildRecognizedText(),
+                          const SizedBox(height: 32),
+                          // Skip button
+                          _buildSkipButton(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
+  // ============ WORD CARD ============
+
+  Widget _buildWordCard(dynamic word) {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24,
+        vertical: 16,
+      ), // Reduced vertical padding
+      child: Column(
+        children: [
+          // Image
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SmartImage(
+              emoji: word.emoji,
+              height: 120, // Reduced from 140
+              fit: BoxFit.contain,
+            ),
+          ),
+
+          const SizedBox(height: 12), // Reduced from 16
+          // English word
+          Text(
+            word.word,
+            style: AppTextStyles.heading2.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 30, // Slightly reduced
+              letterSpacing: 1.2,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          // Vietnamese meaning
+          Text(
+            word.meaning,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============ LISTEN BUTTON ============
+
+  Widget _buildListenButton() {
+    return GestureDetector(
+      onTap: controller.playCurrentWord,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.pastelBlue.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.volume_up_rounded,
+              color: AppColors.pastelBlue,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Nghe phát âm',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.pastelBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============ MICROPHONE BUTTON ============
+
+  Widget _buildMicrophoneButton() {
+    return Obx(() {
+      final listening = controller.isListening.value;
+
+      return AnimatedMicButton(
+        isListening: listening,
+        onTapToggle: () => controller.toggleListening(),
+      );
+    });
+  }
+
+  // ============ RECOGNIZED TEXT ============
+
+  Widget _buildRecognizedText() {
+    return Obx(() {
+      final text = controller.recognizedText.value;
+      final listening = controller.isListening.value;
+
+      if (text.isEmpty && !listening) {
+        return Text(
+          'Nhấn giữ 🎤 để nói',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textSecondary.withOpacity(0.6),
+            fontStyle: FontStyle.italic,
+          ),
+        );
+      }
+
+      if (listening && text.isEmpty) {
+        return Pulse(
+          infinite: true,
+          child: Text(
+            '🎧 Đang nghe...',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: const Color(0xFFFF6B6B),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        );
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          '"$text"',
+          style: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      );
+    });
+  }
+
+  // ============ SCORE FEEDBACK (REMOVED - MOVED TO FLOATING PILL) ============
+  // Widget _buildScoreFeedback() {}
+
+  // ============ SKIP BUTTON ============
+
+  Widget _buildSkipButton() {
+    return TextButton(
+      onPressed: controller.skipWord,
+      child: Text(
+        'Bỏ qua ›',
+        style: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.textSecondary.withOpacity(0.5),
+          fontWeight: FontWeight.w400,
+          fontSize: 14,
+        ),
+      ),
+    );
+  }
+}
+```

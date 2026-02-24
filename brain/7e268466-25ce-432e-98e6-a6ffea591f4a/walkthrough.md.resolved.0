@@ -1,0 +1,50 @@
+# Kết Quả Sửa Lỗi & Hướng Dẫn Phân Loại
+
+Chào bạn, tôi là Su. Tôi đã hoàn thành việc sửa lỗi cú pháp trong file JSON và dưới đây là giải thích chi tiết về cách phân loại vật phẩm để bạn nắm rõ.
+
+## 1. Sửa lỗi JSON
+Lỗi "Unexpected end of string" xảy ra do dòng 39 bị viết dồn cục và thiếu dấu ngoặc kép. Tôi đã tách ra và định dạng lại đúng chuẩn:
+
+```json
+// Trước khi sửa:
+"price: 150,"type": "hat","category": "event_summer",
+
+// Sau khi sửa:
+"price": 150,
+"type": "hat",
+"category": "event_summer",
+```
+
+## 2. Cơ chế Phân Loại (Index/Tabs)
+Trong ứng dụng của bạn (cụ thể là trong [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-285)), việc phân loại vật phẩm vào các tab được dựa trên 2 trường dữ liệu chính trong file JSON:
+
+### A. Trường `type` (Loại vật phẩm)
+Quyết định vật phẩm đó thuộc nhóm chức năng nào:
+- `hat`: Mũ (Hiển thị trong tab "Mũ" hoặc "Quần áo").
+- `glasses`: Kính (Hiển thị trong tab "Kính" hoặc "Quần áo").
+- `neck`: Đồ đeo cổ (Nơ, khăn choàng).
+- `energy` / `energy_ad`: Vật phẩm năng lượng (Hiển thị trong tab "Năng lượng").
+- `background` / `furniture`: Đồ trang trí phòng (Hiển thị trong tab "Phòng").
+
+### B. Trường `category` (Danh mục sự kiện)
+Dùng để lọc các vật phẩm đặc biệt hoặc bình thường:
+- `normal`: Đồ cơ bản.
+- `event_summer`, `event_halloween`, `event_winter`: Đồ thuộc sự kiện, sẽ được ưu tiên hiển thị trong tab "Sự kiện".
+
+## 3. Logic lọc trong Code
+Dưới đây là cách [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-285) lọc dữ liệu cho từng tab (index):
+
+| Tab UI | Điều kiện lọc |
+| :--- | :--- |
+| **Năng lượng** | `type == 'energy'` hoặc `'energy_ad'` |
+| **Mũ** | `type == 'hat'` |
+| **Kính** | `type == 'glasses'` |
+| **Sự kiện** | `category != 'normal'` |
+| **Phòng** | `type == 'background'` hoặc `'furniture'` |
+| **Quần áo** | `category == 'normal'` và (`type` là `hat`, `glasses` hoặc `neck`) |
+
+> [!TIP]
+> Nếu bạn muốn thêm một vật phẩm mới vào một tab cụ thể, chỉ cần đảm bảo `type` và `category` của nó khớp với các điều kiện trên.
+
+---
+Tôi đã kiểm tra file JSON bằng Node.js và xác nhận file hiện tại **hoàn toàn hợp lệ**. Bạn có thể yên tâm sử dụng tiếp!

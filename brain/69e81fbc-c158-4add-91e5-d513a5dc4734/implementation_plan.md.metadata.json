@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Kế hoạch tích hợp Firestore + FireCMS vào app Learn English. Bao gồm: Firebase setup, Firestore schema design (topics → vocabularies), tạo FirestoreVocabularyRepository với offline cache, thêm fromFirestore/toFirestore vào models, seed script, và cập nhật DI cho controllers.",
+  "updatedAt": "2026-02-16T10:59:34.807995Z",
+  "version": "2"
+}

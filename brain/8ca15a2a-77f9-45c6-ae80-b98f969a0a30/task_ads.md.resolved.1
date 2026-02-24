@@ -1,0 +1,24 @@
+# Task: AdMob & Remote Config Integration
+
+## 1. Setup & Config
+- [/] Thêm dependencies (`google_mobile_ads`, `firebase_remote_config`)
+- [ ] Cấu hình Android (AndroidManifest.xml)
+- [ ] Cấu hình iOS (Info.plist)
+
+## 2. Services
+- [ ] Tạo `RemoteConfigService` (fetch keys, expose values)
+- [ ] Tạo `AdService` (load/show Interstitial, load/show Rewarded)
+- [ ] Khởi tạo trong `main.dart`
+
+## 3. Integration - Interstitial Ads
+- [ ] Cài cắm gọi `showInterstitialAd()` vào [learning_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/learning_controller.dart) khi hoàn thành bài.
+- [ ] Cài cắm gọi `showInterstitialAd()` vào [memory_match_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/memory_match_controller.dart) khi thắng.
+- [ ] Cài cắm gọi `showInterstitialAd()` vào [listen_find_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/listen_find_controller.dart) khi kết thúc.
+
+## 4. Integration - Rewarded Ads (Energy)
+- [ ] Sửa `out_of_energy_dialog.dart` thêm UI nút "Xem quảng cáo (+5 ⚡)"
+- [ ] Tích hợp xử lý gọi `showRewardedAd` và cộng năng lượng qua [ProgressService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#13-961).
+
+## 5. Verify & Test
+- [ ] Đảm bảo Ads không gây crash khi chạy offline.
+- [ ] Kiểm tra remote config fallback default values.

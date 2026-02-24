@@ -1,0 +1,9 @@
+# Tác vụ: Hiển thị năng lượng trong màn hình học tập
+
+Dùng để theo dõi tiến độ thêm hiển thị năng lượng vào header của các bài học.
+
+- [x] Thêm hiển thị năng lượng vào [LearningScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/learning_screen.dart#15-425)
+- [x] Thêm hiển thị năng lượng vào [ListenFindScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/listen_find_screen.dart#14-282)
+- [x] Thêm hiển thị năng lượng vào [MemoryMatchScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/memory_match_screen.dart#13-228)
+- [x] Thêm hiển thị năng lượng vào [SpeechPracticeScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/speech_practice_screen.dart#13-417)
+- [x] Kiểm tra và xác minh giao diện trên các màn hình

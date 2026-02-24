@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Đã sửa lỗi JSON trong shop_items_data.json. Lỗi do thiếu dấu ngoặc kép và định dạng sai các thuộc tính tại dóng 39 và 45. Đã xác nhận file JSON hợp lệ sau khi sửa.",
+  "updatedAt":  "2026-02-23T15:51:17.420745Z"
+}

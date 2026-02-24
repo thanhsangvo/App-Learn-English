@@ -1,0 +1,68 @@
+# Kết Quả Sửa Lỗi & Hướng Dẫn Phân Loại
+
+Chào bạn, tôi là Su. Tôi đã hoàn thành việc sửa lỗi cú pháp trong file JSON và dưới đây là giải thích chi tiết về cách phân loại vật phẩm để bạn nắm rõ.
+
+## 1. Sửa lỗi JSON
+Lỗi "Unexpected end of string" xảy ra do dòng 39 bị viết dồn cục và thiếu dấu ngoặc kép. Tôi đã tách ra và định dạng lại đúng chuẩn:
+
+```json
+// Trước khi sửa:
+"price: 150,"type": "hat","category": "event_summer",
+
+// Sau khi sửa:
+"price": 150,
+"type": "hat",
+"category": "event_summer",
+```
+
+## 2. Cơ chế Phân Loại (Index/Tabs)
+Trong ứng dụng của bạn (cụ thể là trong `ShopController`), việc phân loại vật phẩm vào các tab được dựa trên 2 trường dữ liệu chính trong file JSON:
+
+### A. Trường `type` (Loại vật phẩm)
+Quyết định vật phẩm đó thuộc nhóm chức năng nào:
+- `hat`: Mũ (Hiển thị trong tab "Mũ" hoặc "Quần áo").
+- `glasses`: Kính (Hiển thị trong tab "Kính" hoặc "Quần áo").
+- `neck`: Đồ đeo cổ (Nơ, khăn choàng).
+- `energy` / `energy_ad`: Vật phẩm năng lượng (Hiển thị trong tab "Năng lượng").
+- `background` / `furniture`: Đồ trang trí phòng (Hiển thị trong tab "Phòng").
+
+### B. Trường `category` (Danh mục sự kiện)
+Dùng để lọc các vật phẩm đặc biệt hoặc bình thường:
+- `normal`: Đồ cơ bản.
+- `event_summer`, `event_halloween`, `event_winter`: Đồ thuộc sự kiện, sẽ được ưu tiên hiển thị trong tab "Sự kiện".
+
+## 3. Logic lọc trong Code
+Dưới đây là cách `ShopController` lọc dữ liệu cho từng tab (index):
+
+| Tab UI | Điều kiện lọc |
+| :--- | :--- |
+| **Năng lượng** | `type == 'energy'` hoặc `'energy_ad'` |
+| **Mũ** | `type == 'hat'` |
+| **Kính** | `type == 'glasses'` |
+| **Sự kiện** | `category != 'normal'` |
+| **Phòng** | `type == 'background'` hoặc `'furniture'` |
+| **Quần áo** | `category == 'normal'` và (`type` là `hat`, `glasses` hoặc `neck`) |
+
+> [!TIP]
+> Nếu bạn muốn thêm một vật phẩm mới vào một tab cụ thể, chỉ cần đảm bảo `type` và `category` của nó khớp với các điều kiện trên.
+
+---
+ Tôi đã cập nhật thêm các vật phẩm mới vào file `shop_items_data.json`:
+
+### Vật phẩm Sự kiện mới (Tab Cửa hàng > Sự kiện)
+- 🎃 **Mũ Bí Ngô** (`hat_ev_halloween`) - Giá: 200 sao
+- 🥳 **Mũ Tiệc Tùng** (`hat_ev_newyear`) - Giá: 180 sao
+
+### Vật phẩm Bối cảnh mới (Tab Cửa hàng > Phòng)
+- 🛌 **Phòng Ngủ Xanh** (`bg_01`) - Giá: 500 sao
+- 🏖️ **Sân Chơi Nắng** (`bg_02`) - Giá: 600 sao
+- 🏫 **Lớp Học Vui Vẻ** (`bg_03`) - Giá: 700 sao
+
+## 4. Item Tháo Bối Cảnh & Sự Kiện
+Tôi đã bổ sung thêm 2 "Vật phẩm chức năng" vào ứng dụng của bạn (file `shop_data.dart`):
+
+*   🚫 **Tháo Bối Cảnh**: Sẽ hiển thị ở tab "Phòng", hoạt động y hệt nút "Tháo Kính".
+*   🚫 **Tháo Sự Kiện**: Sẽ hiển thị ở tab "Sự Kiện". Nút này đặc biệt hơn, vì nó có khả năng tự quét nếu Maxy đang mặc **bất kỳ trang bị Sự Kiện nào** (có thể là mũ, kính sự kiện cùng lúc) và **tháo toàn bộ chúng ra cùng một lúc**!
+
+Tất cả các vật phẩm này đã được cấu hình đúng `type` và `category` để tự động xuất hiện trong các tab tương ứng của ứng dụng.
+

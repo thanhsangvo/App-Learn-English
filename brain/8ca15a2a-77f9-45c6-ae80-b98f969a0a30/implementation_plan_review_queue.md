@@ -1,0 +1,63 @@
+# Implementation Plan: Review Queue & Incorrect Answer Logic (Option A)
+
+Mục tiêu: Áp dụng cơ chế Hàng đợi nối tiếp (Option A) khi người dùng trả lời sai trong các bài học, kết hợp với việc trừ năng lượng và tước quyền nhận sao.
+
+## Phân tích yêu cầu
+1. **Trừ Năng Lượng**: Trả lời sai -> `-1 ⚡`.
+2. **Không Nhận Sao**: Trả lời sai lần đầu -> đánh dấu câu này không được nhận sao (`canEarnStar = false`). Khi nào làm lại đúng ở cuối dòng thì qua câu nhưng không cộng sao.
+3. **Thêm Vào Cuối Hàng Đợi**: Trả lời sai -> Clone câu hỏi này và đẩy vào cuối danh sách (`questions.add(currentQuestion)`).
+4. **Giữ Nguyên Thanh Progress**: Thanh tiến trình (Progress Bar) chỉ tính dựa trên số lượng câu hỏi ban đầu, không bị thu hẹp hay lùi lại khi list câu hỏi dài ra.
+
+## Đề xuất Thay đổi
+
+### 1. File `lib/presentation/controllers/learning_controller.dart` (Học Flashcard)
+- **Logic**: Hiện tại là lướt thẻ (PageView). Nếu người dùng lướt qua thẻ mà muốn đánh dấu "Chưa thuộc" (hoặc tick sai), ta sẽ push ngược nó lại vào danh sách.
+  - *Lưu ý*: Learning Screen chủ yếu là lướt thẻ, không có nút sai/đúng rõ ràng trừ khi làm bài quiz mini (nếu có). Cần xem lại source code xem Learning Screen có check đúng sai không, hay chỉ là flashcard. (Sẽ check source code)
+
+### 2. File `lib/presentation/controllers/listen_find_controller.dart` (Nghe & Chọn)
+- **Data State**: 
+  - Khai báo biến lưu số câu hỏi gốc (ví dụ: `int initialQuestionCount = vocabs.length`).
+  - Khai báo một `Set<String> failedWordIds` (hoặc index) để lưu các từ đã bị sai lần đầu (để không cho sao).
+- **Thao tác `checkAnswer(int selectedIndex)`**:
+  - Nếu sai:
+    - Trừ năng lượng bằng `ProgressService.instance.consumeEnergy()`.
+    - Trừ xong nếu năng lượng báo false (hết) -> Hiện popup Hết năng lượng.
+    - Thêm id từ vựng vào `failedWordIds`.
+    - Duplicate câu hỏi hiện tại: `vocabs.add(vocabs[currentIndex])`.
+    - Gọi logic qua câu tiếp.
+  - Nếu đúng:
+    - Nếu id *nằm trong* `failedWordIds` -> Bỏ qua cộng sao.
+    - Nếu id *không nằm trong* `failedWordIds` -> Cộng sao (nếu có logic cộng sao theo câu).
+    - Gọi logic qua câu tiếp.
+- **Tiến trình hiển thị UI**: 
+  - Đổi công thức Progress: Từ `(currentIndex.value + 1) / vocabs.length` thành `min(currentIndex.value + 1, initialQuestionCount) / initialQuestionCount`.
+
+### 3. File `lib/presentation/controllers/speech_practice_controller.dart` (Luyện Phát Âm)
+- **Data State**: 
+  - `int initialQuestionCount`.
+  - `Set<int> failedIndexes` hoặc theo ID từ vựng.
+- **Thao tác `evaluateSpeech()`**:
+  - Nếu điểm số (`score`) < ngưỡng đậu (vd 70%):
+    - Coi như Sai.
+    - Trừ năng lượng.
+    - Đánh dấu vào `failedIndexes`.
+    - Add duplicate thẻ vào cuối danh sách `words`.
+    - (Khoan chuyển câu ngay, vì speech practice thường cho người dùng thử lại luôn hoặc có nút Next. Nếu nút Next được bấm -> đi tiếp).
+    - Logic tốt nhất: Nếu sai -> Báo sai -> Trừ năng lượng -> Add vào cuối list -> Vẫn ở lại màn hình cho phép bấm nghe lại/ghi âm lại, HOẶC bấm Bỏ qua (để qua câu khác, lát sau nó sẽ vòng lại). *Sẽ tuỳ chỉnh theo UX hiện tại*.
+- **Tiến trình UI**: Tương tự, `min(currentIndex + 1, initialCount) / initialCount`.
+
+### 4. File `lib/presentation/controllers/memory_match_controller.dart` (Lật Thẻ)
+- Vì Memory Match không lướt theo từng câu mà chơi trên cả một bàn, Option A không áp dụng trực tiếp.
+- **Thao tác Lật sai (Mismatch)**:
+  - Lật lên 2 thẻ không khớp -> Trừ 1 ⚡.
+  - Ngay tại hàm `checkMatch()`, nếu `!isMatch` -> `ProgressService.instance.consumeEnergy()`.
+  - (Xong xử lý check hết năng lượng).
+  - Tước sao: Memory Match thường tính sao tổng thể dựa trên thời gian hoặc số lượt lật (flips). Thay đổi công thức tính sao cho gắt hơn: mỗi lần lật sai trừ bớt quỹ sao có thể nhận.
+
+## Kế hoạch Test
+- Vào "Nghe và Chọn": Trả lời sai 1 câu. Kiểm tra xem năng lượng có bị trừ không, thẻ đó có xuất hiện lại ở cuối danh sách không, chữ số progress (VD: 3/5) có bị lệch thành 3/6 không. (Không được lệch). Vòng lại trả lời đúng xem có được cộng thêm sao không.
+- Làm tương tự với "Phát âm".
+- Vào lật thẻ, lật sai xem có trừ năng lượng.
+
+---
+Bạn xem kỹ phần Đề xuất thay đổi xem có chênh lệch với luồng UX bạn muốn không nhé, nếu OK tôi sẽ áp dụng vào code.

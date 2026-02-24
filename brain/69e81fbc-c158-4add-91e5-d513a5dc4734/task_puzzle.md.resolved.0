@@ -1,0 +1,9 @@
+# Task: Ghép Tranh Foxy (Puzzle Album 3×3)
+
+- [/] Lên kế hoạch triển khai
+- [ ] Tạo dữ liệu tranh (danh sách puzzle + phần thưởng)
+- [ ] Cập nhật ProgressService (lưu trạng thái mảnh ghép đã mở)
+- [ ] Tạo PuzzleController (logic mở mảnh, kiểm tra hoàn thành)
+- [ ] Tạo PuzzleScreen (UI lưới 3×3 với hiệu ứng lật)
+- [ ] Cập nhật PracticeScreen (thay thanh progress cũ)
+- [ ] Kết nối vào hệ thống addPuzzlePiece hiện có

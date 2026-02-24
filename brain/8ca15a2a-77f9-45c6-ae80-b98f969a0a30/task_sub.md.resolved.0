@@ -1,0 +1,27 @@
+# Nhiệm Vụ: Tích Hợp Subscription & Nâng Cấp Ngữ Cảnh
+
+## 1. Thiết lập & Cấu Hình RevenueCat
+- [ ] Thêm thư viện `purchases_flutter` vào pubspec.yaml.
+- [ ] Cài đặt iOS/Android Pods và khởi chạy app lần đầu.
+- [ ] Xây dựng dịch vụ trung tâm `RevenueCatService`.
+  - [ ] Initialize SDK theo Platform.
+  - [ ] Gọi API Fetch Offerings.
+  - [ ] Logic Purchase Package.
+  - [ ] Stream lắng nghe `CustomerInfo` để xác định trạng thái VIP.
+
+## 2. Kết Nối Trạng Thái Ứng Dụng (VIP Logic)
+- [ ] Cập nhật [ProgressService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#13-961) (hoặc Controller) để chứa biến `isSuperMaxy`.
+- [ ] Logic: Trừ Năng Lượng trong game -> Kiểm tra nếu `isSuperMaxy` thì không trừ.
+- [ ] Logic: Mở thẻ Topic/Lesson -> Nếu `isSuperMaxy` thì Bypass trạng thái khóa (`isUnlocked = true`).
+- [ ] Logic: Hiện Quảng Cáo Interstitial -> Nếu báo `isSuperMaxy` -> Không gọi [showInterstitialAd](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/ad_service.dart#65-93).
+- [ ] Logic: Thưởng Sao Cuối Game -> Nếu `isSuperMaxy` -> `earnedStars = baseStars * 2`.
+
+## 3. UI/UX "Super Maxy" & Contextual Upsell (Nâng Cấp Ngữ Cảnh)
+- [ ] Tạo Widget Màn hình chốt đơn `paywall_dialog.dart` (Giao diện mua VIP với 2 nút: Chu kỳ Tháng & Chu kỳ Năm).
+- [ ] **Tab Hồ Sơ:** Nút Upgrade to VIP.
+- [ ] **Ngữ Cảnh 1 - Cửa hàng & Hết Năng lượng:** Nút Tắt QC, Vô hạn Pin dẫn ra Nâng Cấp VIP.
+- [ ] **Ngữ Cảnh 2 - Chạm vào bài khóa:** Popup "Mở khóa tất cả bài học ngay!" -> dẫn ra Paywall.
+
+## 4. Test & Verification
+- [ ] Xây dựng mô phỏng trả phí Sandbox trên iPhone/Android để đảm bảo Flow được xác nhận.
+- [ ] Test offline cache.

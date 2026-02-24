@@ -1,0 +1,14 @@
+# Kế hoạch Mở rộng Cửa hàng Foxy (Foxy Shop Expansion)
+
+- [ ] 1. Nâng cấp Data Model
+  - [ ] Thêm mảng `category` vào [ShopItemModel](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/models/shop_item_model.dart#2-35)
+  - [ ] Hỗ trợ JSON serialization cho field mới
+- [ ] 2. Cập nhật Danh sách Sản phẩm
+  - [ ] Thêm đồ vật tĩnh (nhóm thường, nhóm sự kiện)
+  - [ ] Thêm Backgrounds & Furniture
+- [ ] 3. Cập nhật Màn hình Cửa hàng (UI Shop)
+  - [ ] Thêm Tab Bar (Tất cả, Trang phục, Sự kiện, Bối cảnh)
+  - [ ] Hiệu ứng viền/highlight cho đồ sự kiện
+- [ ] 4. Tích hợp Bối cảnh vào Avatar (Foxy Avatar)
+  - [ ] Sửa đổi UI render để hỗ trợ layer background, furniture
+  - [ ] Kiểm thử việc mua và apply background mới

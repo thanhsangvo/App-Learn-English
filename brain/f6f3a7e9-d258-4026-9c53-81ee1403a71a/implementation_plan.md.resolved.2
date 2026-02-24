@@ -1,0 +1,72 @@
+# Implementation Plan - Shopee Profit Master 2026
+
+**Goal**: Build a professional web application to calculate Shopee profits, visualize costs, and provide AI-style recommendations based on 2026 policies.
+
+## User Review Required
+> [!IMPORTANT]
+> **Tech Stack Selection**: I am proposing **React (Vite) + Tailwind CSS** for a modern, responsive web application. Please confirm if you prefer this or a different stack (e.g., Next.js, Vue, or Python/Streamlit).
+>
+> **AI Features**: The "AI Advisor" will initially use **rule-based heuristics** (e.g., "If profit margin < 10%, recommend reviewing costs"). If you need integration with a real LLM (OpenAI/Gemini), please specify, as that requires API keys.
+
+## Proposed Architecture
+
+### Tech Stack
+- **Framework**: React (Vite)
+- **Styling**: Tailwind CSS + Shadcn/UI (for professional look)
+- **Charts**: Recharts (for Cost Structure & Breakeven charts)
+- **Export**: SheetJS (Excel), `html-docx-js` (Word)
+- **State Management**: React Context or Zustand
+
+### Directory Structure
+```
+src/
+├── components/
+│   ├── CalculatorForm.jsx    # Input for price, costs, category selection
+│   ├── ResultsPanel.jsx      # Display Profit, Margin, Fees
+│   ├── CostChart.jsx         # Pie/Bar charts
+│   ├── AIAdvisor.jsx         # Recommendation engine
+│   ├── SavedResultsTable.jsx # Table for stored calculations
+│   ├── AffiliateBanner.jsx   # Affiliate marketing component
+│   └── Header.jsx
+├── utils/
+│   ├── feeCalculators.js     # Logic for Shopee 2026 fees (4.91% payment, etc.)
+│   └── exportUtils.js        # Excel/Word export logic
+├── App.jsx
+└── index.css                 # Tailwind directives
+```
+
+## Proposed Changes
+
+### Logic Implementation
+#### [NEW] [feeCalculators.js](file:///src/utils/feeCalculators.js)
+- Implement `calculatePaymentFee(total, rate=0.0491)`
+- Implement `calculateFixedFee(category, isMall)`
+- Implement [calculateBreakeven(cost, fixedCosts)](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/utils/feeCalculators.js#112-150)
+
+### UI Implementation
+#### [NEW] [CalculatorForm.jsx](file:///src/components/CalculatorForm.jsx)
+- Fields: Selling Price, Import Price, Voucher Xtra (Yes/No), Freeship Xtra (Yes/No), Category.
+- Additional Field: "PiShip Package" (Fixed 1,620đ).
+
+#### [NEW] [AIAdvisor.jsx](file:///src/components/AIAdvisor.jsx)
+- Input: Profit Margin, Total Fees.
+- Output: Text advice (e.g., "Good margin (>20%)", "High risk (<5%)").
+
+#### [NEW] [SavedResultsTable.jsx](file:///src/components/SavedResultsTable.jsx)
+- Displays a table of saved calculations with key metrics (Selling Price, Margin, Profit).
+- Actions: Save, Delete, Export List.
+
+#### [NEW] [AffiliateBanner.jsx](file:///src/components/AffiliateBanner.jsx)
+- A stylish banner calling for support via affiliate links.
+- Contextual link for "Packaging Tape" to be placed near packaging cost input.
+
+## Verification Plan
+
+### Automated Tests
+- Run `npm run test` (Vitest) to verify calculation logic in [feeCalculators.js](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/utils/feeCalculators.js).
+  - Case 1: Shop Thường, Fashion Category -> Fixed Fee X%.
+  - Case 2: Payment Fee 4.91% check.
+
+### Manual Verification
+- **Browser Testing**: Include a "Test Case" button that fills inputs with a known Shopee order example to verify the Net Profit matches the Excel manual calculation.
+- **Export Test**: Click "Export Excel" and verify the downloaded file opens correctly.

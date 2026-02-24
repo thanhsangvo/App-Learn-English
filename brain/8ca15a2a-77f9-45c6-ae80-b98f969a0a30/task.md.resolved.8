@@ -1,0 +1,21 @@
+# Task: Màn Hình Streak - Chuỗi Học Tập
+
+## Service Layer
+- [x] Nâng cấp [ProgressService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#8-416): thêm `isStreakActiveToday`, `weeklyActivityDays`, [checkDailyStreak()](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#387-392) <!-- id: 0 -->
+
+## Controller + Binding
+- [x] Tạo [StreakController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/streak_controller.dart#7-89) (quản lý animation state, weekly data) <!-- id: 1 -->
+- [x] Tạo [StreakBinding](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/bindings/streak_binding.dart#4-10) <!-- id: 2 -->
+
+## UI - Streak Screen
+- [x] Tạo [StreakScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/streak_screen.dart#9-288) với: Flame animation, Weekly calendar, Foxy message, CTA button <!-- id: 3 -->
+
+## Integration - Icon Ngọn Lửa
+- [x] Cập nhật icon 🔥 trên [PracticeScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/practice_screen.dart#11-338) (Hero + Active/Inactive state) <!-- id: 4 -->
+- [/] Thêm icon 🔥 vào [HomeScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/home_screen.dart#17-253) header <!-- id: 5 -->
+
+## Routing
+- [x] Thêm route `/streak` vào [app_routes.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/routes/app_routes.dart) + [app_pages.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/routes/app_pages.dart) <!-- id: 6 -->
+
+## Verification
+- [ ] Chạy `flutter analyze` và kiểm tra UI trên emulator <!-- id: 7 -->

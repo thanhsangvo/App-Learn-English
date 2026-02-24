@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_WALKTHROUGH",
+  "summary":  "Walkthrough describes the unification of badge UI (energy and score) across all learning screens, fixing layout jumps with fixed minimum widths and premium \"Pro Max\" styling. Includes screenshots of the refined badges.",
+  "updatedAt":  "2026-02-22T19:29:37.622738Z"
+}

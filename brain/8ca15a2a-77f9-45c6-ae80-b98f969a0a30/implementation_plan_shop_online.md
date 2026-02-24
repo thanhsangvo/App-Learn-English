@@ -1,0 +1,39 @@
+# Chuyển Đổi Dữ Liệu Shop Sang Firebase (Option A)
+
+Đưa toàn bộ danh sách phụ kiện (Mũ, Kính, Vòng cổ) lên Firestore để quản lý tập trung và thêm khả năng tinh chỉnh vị trí ngay trong cơ sở dữ liệu.
+
+## Proposed Changes
+
+### 1. Data Models
+#### [MODIFY] [shop_item_model.dart](file:///Users/devsang/Developer/App Learn English/lib/data/models/shop_item_model.dart)
+Cập nhật `ShopItemModel` để có thêm:
+- `double dx`
+- `double dy`
+- `double scale`
+- `bool isOnline` (để phân biệt đồ fetch và đồ local).
+Cập nhật hàm `fromJson` và `toJson`.
+
+### 2. Local Data
+#### [MODIFY] [shop_data.dart](file:///Users/devsang/Developer/App Learn English/lib/data/data_sources/shop_data.dart)
+Gọt giũa lại danh sách tĩnh. Chỉ giữ lại:
+- Đồ năng lượng (`energy`, `energy_ad`)
+- Vật phẩm tháo đồ (`remove_hat`, `remove_glasses`)
+Các món đồ thời trang (hat_01...vv) sẽ được xoá khỏi đây và chuyển thành file JSON để người dùng kéo lên Firebase.
+
+### 3. Controller & Sync Logic
+#### [MODIFY] [shop_controller.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/controllers/shop_controller.dart)
+Thêm logic:
+- Fetch collection `shop_items` từ Firestore (`FirebaseFirestore.instance.collection('shop_items')`).
+- Merge danh sách online này với danh sách `ShopData.allItems` local.
+- Lưu cache lại danh sách online vào LocalStorage/SharedPreferences/GetStorage (để offline vẫn có đồ mặc).
+
+### 4. UI Rendering
+#### [MODIFY] [maxy_avatar.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/widgets/maxy_avatar.dart)
+Sửa hàm `_buildAccessoryLayer` để KHÔNG dùng hardcode nữa, mà đọc thẳng giá trị `dx`, `dy`, `scale` từ `item.dx`, `item.dy`, `item.scale`.
+
+## Verification Plan
+
+### Manual Verification
+1. Xoá cache app (nếu có). Mở Cửa hàng, app sẽ fetch đồ từ Firebase xuống (danh sách sẽ rỗng nếu mây chưa có gì ngoài năng lượng).
+2. Tắt Wifi, mở lại Cửa hàng. Đồ cũ đã tải phải xuất hiện y nguyên (nhờ Cache).
+3. Đội mũ và kiểm tra tỷ lệ scale/dx/dy đã khớp cấu hình mới chưa.

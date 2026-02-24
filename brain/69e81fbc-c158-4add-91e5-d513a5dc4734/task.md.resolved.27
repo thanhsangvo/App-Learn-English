@@ -1,0 +1,41 @@
+# Task: Tích hợp Firestore + FireCMS
+
+## Giai đoạn 1: Firebase Setup
+- [x] Thêm firebase_core, cloud_firestore vào pubspec.yaml
+- [x] Chạy `flutterfire configure` tạo firebase_options.dart
+- [x] Khởi tạo Firebase trong main.dart
+- [x] Configure Subcollections (Vocabularies)
+- [x] Implement Smart Image Loading (Online/Offline support) <!-- Updated for online images -->
+- [x] Review & Polish FireCMS UI <!-- Verified image preview and properties -->
+
+## Giai đoạn 2: Data Models
+- [x] Thêm fromFirestore/toFirestore cho TopicModel
+- [x] Thêm fromFirestore/toFirestore cho VocabularyModel
+
+## Giai đoạn 3: Repository
+- [x] Tạo FirestoreVocabularyRepository
+- [x] Implement offline cache fallback
+- [x] Tạo seed script upload data lên Firestore
+
+## Giai đoạn 4: Dependency Injection
+- [x] Cập nhật HomeController
+- [x] Cập nhật SpeechPracticeController
+- [x] Cập nhật MemoryMatchController
+- [x] Cập nhật ListenFindController
+
+## Giai đoạn 5: Verify
+- [x] flutter analyze
+- [x] Test app load data từ Firestore
+- [x] Test offline mode
+
+## Giai đoạn 6: FireCMS Setup
+- [x] Đăng ký account tại FireCMS Cloud
+- [x] Connect Firebase Project
+- [x] Verify data trên Cloud CMS
+
+## Giai đoạn 7: Optimization (Performance)
+- [x] Implement Instant Emoji Placeholder (SmartImage)
+- [x] Implement Hybrid Data Loading (Instant Local + Background Sync)
+- [x] Cleanup data_import.json (Remove imagePath)
+- [x] Implement Smart Splash Prefetch (Blocking First Run + Background Update)
+- [x] Hoàn toàn loại bỏ imagePath (Emoji First UI)

@@ -1,0 +1,26 @@
+# Kế hoạch thêm âm thanh Click cho Topic và Mini-games
+
+Thêm hiệu ứng âm thanh `click.mp3` khi người dùng tương tác với các thành phần chính để cải thiện phản hồi xúc giác (haptic feedback) qua âm thanh.
+
+## Thay đổi dự kiến
+
+### 1. Phân hệ Home (Topic Selection)
+- **File**: [lib/presentation/screens/home_screen.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/home_screen.dart).
+- **Thay đổi**: Thêm [AudioHelper().playClick()](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/utils/audio_helper.dart#8-140) trong `onTopicTap` của [AdventureMap](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/adventure_map.dart#8-82).
+
+### 2. Phân hệ Sân chơi (Mini-games)
+- **File**: [lib/presentation/screens/practice_screen.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/practice_screen.dart).
+- **Thay đổi**: 
+    - Thêm sound click vào [_buildDailyChallenge](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/practice_screen.dart#153-275) (Thử thách hằng ngày).
+    - Thêm sound click vào [_buildGameCard](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/practice_screen.dart#377-413) (Các trò chơi mini trong grid).
+
+### 3. Các thành phần khác (Nếu cần)
+- Kiểm tra các button quan trọng khác trong luồng chuyển cảnh game.
+
+## Kế hoạch xác minh
+
+### Kiểm tra thủ công
+1. Mở tab **Hành trình** (Home), bấm vào một Topic và nghe âm thanh.
+2. Mở tab **Sân chơi** (Practice), bấm vào **Thử thách hằng ngày**.
+3. Bấm vào các game mini như **Memory Match**, **Listen & Find**, v.v.
+4. Xác nhận âm thanh phát ra ngay lập tức và không bị trễ khi bấm nhanh.

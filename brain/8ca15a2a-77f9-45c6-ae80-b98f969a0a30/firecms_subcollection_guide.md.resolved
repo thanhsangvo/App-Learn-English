@@ -1,0 +1,19 @@
+# Hướng dẫn cấu hình Subcollection (Từ vựng)
+
+Vì dữ liệu của chúng ta có cấu trúc lồng nhau:
+[Topics](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/repositories/firestore_vocabulary_repository.dart#26-64) (Chủ đề) -> chứa nhiều -> `Vocabularies` (Từ vựng).
+
+Nên trong FireCMS Cloud, bạn cần khai báo để nó hiểu cấu trúc này:
+
+1.  Bấm vào collection **"Topics"** bạn vừa tạo.
+2.  Bấm vào icon **"Settings"** (bánh răng ⚙️) ở góc trên bên phải của collection đó.
+3.  Chọn tab **"Subcollections"**.
+4.  Bấm **"Add subcollection"**.
+5.  Điền thông tin:
+    -   **Path**: `vocabularies` (Phải chính xác từ này).
+    -   **Name**: Vocabularies.
+    -   **Singular name**: Vocabulary.
+6.  Bấm **Save**.
+
+👉 **Kết quả:**
+Giờ đây, khi bạn bấm vào một Topic cụ thể (ví dụ "Animals"), bạn sẽ thấy một tab hoặc menu con tên là **"Vocabularies"**. Bấm vào đó sẽ hiện ra danh sách các từ vựng (Cat, Dog...) của chủ đề đó!

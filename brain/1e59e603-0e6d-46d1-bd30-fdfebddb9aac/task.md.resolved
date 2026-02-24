@@ -1,0 +1,8 @@
+# Task Checklist: Cập nhật hệ thống Shop Dynamic
+
+- [x] Lập kế hoạch thực hiện (Implementation Plan)
+- [x] Cập nhật [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-285) để quản lý việc tìm kiếm vật phẩm
+- [x] Cập nhật [MaxyAvatar](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/maxy_avatar.dart#13-28) sử dụng dữ liệu từ Controller thay vì file tĩnh
+- [x] Tối ưu hóa việc tải và sắp xếp dữ liệu (Event items lên đầu)
+- [x] Thêm huy hiệu EVENT và cải thiện hiển thị bối cảnh
+- [x] Kiểm tra và xác nhận hoạt động

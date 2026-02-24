@@ -1,0 +1,15 @@
+# Task: Migrate Shop Items to Firebase
+
+- [x] Update [ShopItemModel](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/models/shop_item_model.dart#2-58)
+  - [x] Add `dx`, `dy`, `scale` fields.
+  - [x] Add `isOnline` field (default `false`).
+  - [x] Update `fromJson` and [toJson](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#1000-1014).
+- [x] Prepare Firestore Data
+  - [x] Create a JSON array of current [shop_data.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart) items (hats, glasses, neck) with their respective offsets.
+  - [x] Added button in the app (Profile screen) to automate uploading [shop_items_data.json](file:///Users/devsang/.gemini/antigravity/brain/8ca15a2a-77f9-45c6-ae80-b98f969a0a30/shop_items_data.json) to Firestore.
+- [x] Update [ShopData](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart#6-108)
+  - [x] Remove hardcoded hats, glasses, and neck items from [shop_data.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/data_sources/shop_data.dart) (except for the `remove_` items and `energy` items).
+- [x] Implement Fetching and Caching
+  - [x] Update [ShopController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/shop_controller.dart#13-268) (or create a dedicated `ShopService`) to fetch from Firestore `shop_items`.
+  - [x] Implement local caching (e.g., using `SharedPreferences` or `hive`) to store fetched items.
+  - [x] Merge fetched online items with local static items (`energy`, `remove_` items) in `itemsByType`.

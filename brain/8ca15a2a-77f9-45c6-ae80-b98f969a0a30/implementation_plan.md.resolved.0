@@ -1,0 +1,30 @@
+# Implement Move Settings Button to Bottom
+
+## Goal Description
+The user wants to move the settings button from the top-right corner of the profile header to the bottom of the screen for better accessibility and aesthetics, following the `ui-ux-pro-max` guidelines.
+
+## User Review Required
+> [!NOTE]
+> The button will be moved to the bottom of the scrollable content in [ProfileAchievementsScreen](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/profile/profile_achievements_screen.dart#13-508). It will be styled as a premium glass-morphism button to match the app's aesthetic.
+
+## Proposed Changes
+
+### Presentation Layer
+
+#### [MODIFY] [profile_achievements_screen.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/profile/profile_achievements_screen.dart)
+- Remove `Align` widget containing the settings button from [_buildHeader](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/profile/profile_achievements_screen.dart#54-254).
+- Add `_buildSettingsButton` method returning a [GlassCard](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/widgets/glass_card.dart#7-64) (or similar styled container) with `Icons.settings_rounded` and label "Cài đặt ứng dụng".
+- Insert `_buildSettingsButton()` at the bottom of the main `Column` in the [build](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/home_screen.dart#21-66) method.
+
+## Verification Plan
+
+### Automated Tests
+- Run `flutter analyze` to ensure no syntax errors.
+- Run `flutter test` (if applicable) to ensure no regressions.
+
+### Manual Verification
+- Build and run the app: `flutter run -d emulator-5554`.
+- Navigate to the Profile screen.
+- Verify the settings button is no longer in the header.
+- Verify the settings button is at the bottom of the screen.
+- Verify clicking the button opens the settings modal.

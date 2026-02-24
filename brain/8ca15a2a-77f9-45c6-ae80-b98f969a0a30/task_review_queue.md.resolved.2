@@ -1,0 +1,18 @@
+# Task Tracker: Review Queue (Option A)
+
+- [x] Phân tích kỹ source code của [ListenFindController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/listen_find_controller.dart#14-248), [SpeechPracticeController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/speech_practice_controller.dart#12-391) và [LearningController](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/learning_controller.dart#15-253) để nắm bắt flow chuyển câu hiện tại.
+- [x] Cập nhật module Nghe & Tìm ([listen_find_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/listen_find_controller.dart) và UI nếu cần):
+  - [x] Khởi tạo `initialQuestionCount` và list đánh dấu câu đã sai.
+  - [x] Thêm logic clone câu hỏi khi trả lời sai (thêm vào cuối list).
+  - [x] Thêm logic tích hợp gọi trừ năng lượng khi sai.
+  - [x] Tùy chỉnh công thức hiển thị Progress Bar.
+- [x] Cập nhật module Phát âm ([speech_practice_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/speech_practice_controller.dart)):
+  - [x] Khởi tạo `initialQuestionCount` và set đánh dấu lỗi.
+  - [x] Xử lý luồng: báo sai -> clone câu hỏi xuống cuối list -> trừ năng lượng.
+  - [x] Tùy chỉnh Progress Bar.
+- [ ] Cập nhật module Flashcard ([learning_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/learning_controller.dart)):
+  - [ ] Kiểm tra flow tương tác, nếu màn hình này có chấm điểm đúng sai thì áp dụng logic tương tự. Nếu chỉ lướt để học thuộc thì tinh chỉnh hoặc xin ý kiến người dùng.
+- [ ] Cập nhật module Lật bài ([memory_match_controller.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/controllers/memory_match_controller.dart)):
+  - [ ] Lật sai trừ năng lượng trực tiếp.
+- [ ] Kiểm tra toàn diện UI, đặc biệt là progress text (ví dụ "3/5" không biến thành "3/6" khi làm sai).
+- [ ] Viết Walkthrough.

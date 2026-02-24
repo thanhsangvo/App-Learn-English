@@ -1,0 +1,32 @@
+# Implementation Plan - Add Shop Items Collection
+
+The goal is to add the "Shop Items" collection to the FireCMS project so it matches the Firestore structure and appears in the CMS dashboard.
+
+## Proposed Changes
+
+### FireCMS
+
+#### [NEW] [shop_items.tsx](file:///Users/devsang/Developer/App Learn English/FireCMS/src/collections/shop_items.tsx)
+Create a new collection file for shop items with the following properties (based on [ShopItemModel](file:///Users/devsang/Developer/App%20Learn%20English/lib/data/models/shop_item_model.dart#2-58)):
+- `id` (string)
+- `name` (string)
+- `assetPath` (string, with storage config if needed)
+- [price](file:///Users/devsang/Developer/App%20Learn%20English/FireCMS/src/collections/demo.tsx#26-41) (number)
+- `type` (string, with enum values like 'hat', 'glasses', etc.)
+- `category` (string, with enum values like 'normal', 'event_summer', etc.)
+- `dx` (number)
+- `dy` (number)
+- `scale` (number)
+- `isOnline` (boolean)
+
+#### [MODIFY] [App.tsx](file:///Users/devsang/Developer/App Learn English/FireCMS/src/App.tsx)
+- Import `shopItemsCollection` from `./collections/shop_items`.
+- Add `shopItemsCollection` to the `collections` array in the `useMemo` hook.
+
+## Verification Plan
+
+### Manual Verification
+1. Run the FireCMS app locally (`npm run dev`).
+2. Verify that "Shop Items" appears in the sidebar and the dashboard.
+3. Click on "Shop Items" and verify that it correctly displays items from the `shop_items` collection in Firestore.
+4. Try to edit an item to ensure the schema matches.

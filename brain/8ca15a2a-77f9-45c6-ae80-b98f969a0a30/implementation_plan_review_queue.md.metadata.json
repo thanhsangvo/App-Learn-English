@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Implementation plan for Review Queue (Option A). Details how to handle incorrect answers by adding them to the end of the list, deducting energy, updating the progress bar logic, and managing stars.",
+  "updatedAt":  "2026-02-22T19:39:19.027739Z"
+}

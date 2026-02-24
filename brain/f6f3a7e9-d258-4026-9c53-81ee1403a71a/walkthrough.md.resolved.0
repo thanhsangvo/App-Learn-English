@@ -1,0 +1,45 @@
+# Shopee Profit Master 2026 - Walkthrough
+
+## Overview
+This application is a profit calculator for Shopee sellers, updated with 2026 fee policies. It allows users to:
+1.  **Calculate Fees**: Automatically computes Payment Fee (4.91%), Fixed Fees (by category), and Service Fees (Xtra packages).
+2.  **Analyze**: Shows Profit Margin, Net Profit, and Breakeven Price.
+3.  **Visualize**: Uses interactive Pie Charts to show cost structure.
+4.  **Export**: supports exporting reports to Excel and Word.
+
+## How to Run
+
+### 1. Installation
+The project dependencies are already installed. If you need to reinstall:
+```bash
+cd shopee-profit-master
+npm install
+```
+
+### 2. Start Development Server
+To launch the app locally:
+```bash
+npm run dev
+```
+Open the URL shown in the terminal (usually `http://localhost:5173`).
+
+### 3. Build for Production
+To create a production build:
+```bash
+npm run build
+```
+The output will be in the `dist/` folder.
+
+## Features Verified
+
+- [x] **Calculation Logic**: Verified against Shopee 2026 policies (4.91% payment fee).
+- [x] **UI Components**: Calculator Form, Results Panel with Charts.
+- [x] **AI Advisor**: Provides recommendations based on profit margin.
+- [x] **Export**: Excel and Word export functions implemented.
+- [x] **Build**: Project compiles successfully using Vite.
+
+## Project Structure
+- [src/utils/feeCalculators.js](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/utils/feeCalculators.js): Core fee logic.
+- [src/components/CalculatorForm.jsx](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/components/CalculatorForm.jsx): Main input form.
+- [src/components/ResultsPanel.jsx](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/components/ResultsPanel.jsx): Visualization & Export.
+- [src/components/AIAdvisor.jsx](file:///Users/devsang/Developer/Antigravity%20Kit/shopee-profit-master/src/components/AIAdvisor.jsx): Recommendation engine.

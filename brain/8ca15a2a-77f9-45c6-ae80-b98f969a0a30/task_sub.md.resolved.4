@@ -1,0 +1,21 @@
+# Nhiệm Vụ: Tích Hợp Subscription & Nâng Cấp Ngữ Cảnh
+
+## 1. Thiết lập & Cấu Hình RevenueCat
+- [x] Thêm thư viện `purchases_flutter` vào pubspec.yaml.
+- [x] Xây dựng dịch vụ trung tâm [RevenueCatService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/revenuecat_service.dart#6-115).
+- [x] Inject [RevenueCatService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/revenuecat_service.dart#6-115) vào [main.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/main.dart).
+
+## 2. Kết Nối Trạng Thái Ứng Dụng (VIP Logic)
+- [x] Không trừ Năng Lượng nếu `isSuperMaxy`.
+- [x] Mở khóa toàn bộ Topic nếu `isSuperMaxy`.
+- [x] Không hiện Quảng Cáo Interstitial nếu `isSuperMaxy`.
+- [x] X2 Sao thưởng cuối game nếu `isSuperMaxy`.
+
+## 3. UI/UX "Super Maxy" & Contextual Upsell
+- [x] Tạo [paywall_dialog.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/paywall_dialog.dart) (Giao diện mua VIP).
+- [x] Kết nối Paywall vào [out_of_energy_dialog.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/widgets/out_of_energy_dialog.dart).
+- [x] Thêm nút Upgrade VIP vào [profile_achievements_screen.dart](file:///Users/devsang/Developer/App%20Learn%20English/lib/presentation/screens/profile/profile_achievements_screen.dart).
+
+## 4. Test & Verification
+- [x] Dart analyze — No errors.
+- [ ] Test Sandbox trên device thật (cần API Key thật từ RevenueCat Dashboard).

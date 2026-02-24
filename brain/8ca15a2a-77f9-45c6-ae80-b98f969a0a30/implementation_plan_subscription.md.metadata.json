@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Implementation plan for integrating RevenueCat to offer a single 'Super Maxy' subscription tier. Details include installing the SDK, setting up the purchase service, creating contextual paywall popups, and modifying existing logic to enforce premium constraints appropriately.",
+  "updatedAt":  "2026-02-22T18:01:44.057387Z"
+}

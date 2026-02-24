@@ -1,0 +1,7 @@
+# Tasks
+
+- [ ] Move Disclaimer to Settings Sheet <!-- id: 0 -->
+    - [ ] Add Disclaimer button in Settings <!-- id: 1 -->
+    - [ ] Remove Disclaimer icon from Main Screen AppBar <!-- id: 2 -->
+- [ ] Add Privacy Policy to Settings Sheet <!-- id: 3 -->
+    - [ ] Implement URL launcher for Privacy Policy <!-- id: 4 -->

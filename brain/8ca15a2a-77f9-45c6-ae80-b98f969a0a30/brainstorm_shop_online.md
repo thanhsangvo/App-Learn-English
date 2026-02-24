@@ -1,0 +1,90 @@
+## 🧠 Brainstorm: Chuyển Dữ liệu Cửa hàng lên Online & Tùy chỉnh Tọa độ
+
+### Context
+Hiện tại, toàn bộ danh sách đồ trong Cửa hàng (Mũ, Kính, Vòng cổ) và toạ độ hiển thị (top, scale, dx, dy) đang được code "cứng" (hard-code) bên trong app (tại `shop_data.dart` và `maxy_avatar.dart`). Người dùng muốn:
+1. Chuyển các item trang trí này thành dữ liệu online (giống Firebase của Topic) để dễ dàng thêm/sửa đồ sự kiện mà không cần update app.
+2. Lưu luôn các tham số lệch tọa độ (`dx`, `dy`, `scale`) vào Model để dễ chỉnh sửa.
+3. Giữ lại các gói Năng lượng (Energy) trực tiếp trong app (vì chúng là hàng thiết yếu, cố định).
+
+---
+
+### Cập nhật cấu trúc `ShopItemModel`
+Trước khi triển khai, ta buộc phải thêm các trường offset vào model.
+```dart
+class ShopItemModel {
+  final String id;
+  final String name;
+  final String assetPath;
+  final int price;
+  final String type;
+  final String category;
+  
+  // -- Các trường mới --
+  final double dx;
+  final double dy;
+  final double scale;
+  final bool isOnline; // Để phân biệt đồ fetch từ mạng và đồ local (năng lượng)
+  
+  // ... (constructor & fromJson / toJson)
+}
+```
+
+---
+
+### Option A: Lưu thẳng lên Cloud Firestore (Giấy tờ như Collection `topics`)
+Tạo một collection mới trên Firebase tên là `shop_items`. Mỗi document đại diện cho một món đồ (Mũ, Kính). Khi vào app, `ShopController` sẽ fetch danh sách này về và gộp chung với danh sách Năng lượng local.
+
+✅ **Pros:**
+- Chuẩn nhất, tương đồng 100% với cách app đang quản lý `topics`.
+- Có thể dùng FireCMS (nếu có) để thêm bớt mũ nón dễ dàng, điền toạ độ bằng giao diện web.
+- Hỗ trợ tốt nếu sau này muốn thêm tính năng "Đồ giới hạn" (Limited edition) đếm ngược số lượng.
+
+❌ **Cons:**
+- Tốn lượt read (đọc) của Firebase mỗi lần người dùng mở Cửa hàng (dù rất ít).
+- Cần viết logic sync (đồng bộ) giữ đồ đã trang bị (nếu offline thì mèo mất đồ?). Cần cache (lưu nháp) xuống máy.
+
+📊 **Effort:** Medium | **Khuyên dùng:** Rất tốt nếu app liên tục có sự kiện.
+
+---
+
+### Option B: Sử dụng Firebase Remote Config (Cấu hình đám mây)
+Thay vì tạo collection database, lưu toàn bộ danh sách đồ dưới dạng một chuỗi JSON khổng lồ trên Firebase Remote Config.
+
+✅ **Pros:**
+- Hoàn toàn MIỄN PHÍ lượt đọc, sinh ra để làm các việc như "thay đổi cấu hình shop".
+- Tự động cache dưới máy, mở app phát có ngay lập tức không lo mạng lag mèo bị cởi truồng.
+
+❌ **Cons:**
+- Edit JSON bằng tay trên console của Firebase hơi cực (dễ dư/thiếu dấu phẩy `}`).
+- Không dùng được FireCMS để edit.
+
+📊 **Effort:** Low | **Khuyên dùng:** Nhanh gọn lẹ nếu không thêm đồ thường xuyên.
+
+---
+
+### Option C: Tách file JSON Local, sau này mới lên mây mây
+Tạm thời tải toàn bộ cái list từ `shop_data.dart` ra một file `assets/data/shop_items.json`. Đọc file JSON này vào `ShopItemModel`.
+
+✅ **Pros:**
+- Setup xong nền tảng để lên server ngay sau đó (vì mọi thứ đã thành logic đọc JSON).
+- Không lo rủi ro sập mạng.
+- Tách bạch UI và Data ngay lập tức.
+
+❌ **Cons:**
+- Vẫn phải update app mới có đồ rớt rơi.
+- Chưa thoả mãn đề bài "đưa lên online".
+
+📊 **Effort:** Low 
+
+---
+
+## 💡 Recommendation
+
+**Option A (Kết hợp Caching local)** là giải pháp triệt để và chuyên nghiệp nhất.
+- Chúng ta sẽ thiết kế collection `shop_items` trên Firebase.
+- Model `ShopItemModel` sẽ được thêm `dx`, `dy`, `scale`.
+- Trong `ShopController`, khi fetch được đồ trên mây sẽ trộn (merge) với list Năng lượng cục bộ, sau đó lưu cache lại để mở app lần sau load ngay lập tức mà mèo không bị tàng hình trang bị.
+
+**Câu hỏi cho anh:**
+1. Anh có muốn em bắt đầu sửa `ShopItemModel` và tích hợp nó với logic đọc từ Firebase (Option A) ngay bây giờ không?
+2. Với các món đang có sẵn (Crown, Magic Hat), em sẽ viết sẵn một list JSON tương ứng để anh nhập lên FireCMS/Firestore nhé?

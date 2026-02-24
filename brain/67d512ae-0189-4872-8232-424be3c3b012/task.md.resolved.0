@@ -1,0 +1,5 @@
+# Task: Sửa lỗi JSON trong shop_items_data.json
+
+- [x] Phân tích lỗi JSON <!-- id: 0 -->
+- [/] Sửa lỗi tại dòng 39 và 45 <!-- id: 1 -->
+- [ ] Xác nhận file JSON hợp lệ <!-- id: 2 -->

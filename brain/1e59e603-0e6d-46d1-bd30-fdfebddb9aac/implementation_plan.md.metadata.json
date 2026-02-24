@@ -1,0 +1,5 @@
+{
+  "artifactType":  "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary":  "Kế hoạch cập nhật hệ thống Cửa hàng nhằm loại bỏ sự phụ thuộc vào file `shop_data.dart` tĩnh và chuyển sang sử dụng dữ liệu động từ `ShopController`.",
+  "updatedAt":  "2026-02-23T15:32:39.275761Z"
+}

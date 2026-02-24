@@ -1,0 +1,121 @@
+[
+    {
+        "id": "hat_02",
+        "name": "Mũ Phù Thủy",
+        "assetPath": "🎩",
+        "price": 150,
+        "type": "hat",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 35.0,
+        "scale": 1.35
+    },
+    {
+        "id": "hat_03",
+        "name": "Vương Miện",
+        "assetPath": "👑",
+        "price": 250,
+        "type": "hat",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 15.0,
+        "scale": 1.5
+    },
+    {
+        "id": "hat_06",
+        "name": "Mũ Lưỡi Trai",
+        "assetPath": "🧢",
+        "price": 80,
+        "type": "hat",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.4
+    },
+    {
+        "id": "hat_ev_summer",
+        "name": "Mũ Rơm",
+        "assetPath": "👒",
+    "price: 150,"type": "hat",
+        "category": "event_summer",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.4
+    },
+    {
+        "id": "glass_01",
+        "name": "Kính Râm",
+        "assetPath": "🕶️",
+    "price: 100,"type": "glasses",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 5.0,
+        "scale": 1.25
+    },
+    {
+        "id": "glass_02",
+        "name": "Kính Nobita",
+        "assetPath": "👓",
+        "price": 100,
+        "type": "glasses",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.1
+    },
+    {
+        "id": "glass_03",
+        "name": "Kính Kỹ Sư",
+        "assetPath": "🥽",
+        "price": 150,
+        "type": "glasses",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.1
+    },
+    {
+        "id": "glass_ev_halloween",
+        "name": "Mặt Nạ Ma",
+        "assetPath": "👻",
+        "price": 180,
+        "type": "glasses",
+        "category": "event_halloween",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.1
+    },
+    {
+        "id": "neck_01",
+        "name": "Nơ Cổ",
+        "assetPath": "🎀",
+        "price": 100,
+        "type": "neck",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.0
+    },
+    {
+        "id": "neck_02",
+        "name": "Huy Chương Vàng",
+        "assetPath": "🥇",
+        "price": 250,
+        "type": "neck",
+        "category": "normal",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.0
+    },
+    {
+        "id": "neck_ev_winter",
+        "name": "Khăn Choàng Đỏ",
+        "assetPath": "🧣",
+        "price": 150,
+        "type": "neck",
+        "category": "event_winter",
+        "dx": 0.0,
+        "dy": 0.0,
+        "scale": 1.0
+    }
+]

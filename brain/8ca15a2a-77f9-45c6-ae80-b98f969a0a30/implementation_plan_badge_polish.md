@@ -1,0 +1,28 @@
+# Kế hoạch Đồng bộ và Cố định Giao diện Header (Pro Max)
+
+Người dùng muốn giao diện Năng lượng và Ngôi sao trông đồng nhất và không bị "nhảy" (thay đổi kích thước) khi con số bên trong thay đổi.
+
+## Thay đổi dự kiến
+
+### 1. Nâng cấp `EnergyBadge`
+- **File**: `lib/presentation/widgets/energy_badge.dart`
+- **Thay đổi**: 
+    - Thêm `constraints: const BoxConstraints(minWidth: 80)` để cố định chiều rộng tối thiểu.
+    - Căn giữa nội dung trong container.
+    - Sử dụng `AppColors.sunnyYellow` cho viền để đồng bộ màu sắc.
+
+### 2. Tạo mới `ScoreBadge`
+- **File**: [NEW] `lib/presentation/widgets/score_badge.dart`
+- **Thay đổi**: Tạo widget mới có giao diện y hệt `EnergyBadge` (viền vàng, nền trắng, đổ bóng nhẹ) nhưng dùng cho điểm số (Ngôi sao).
+- **Tính năng**: Cố định chiều rộng tối thiểu (khoảng 70-80px) để không bị nhảy khi điểm tăng.
+
+### 3. Cập nhật các màn hình học tập
+- **Files**: `learning_screen.dart`, `listen_find_screen.dart`, `memory_match_screen.dart`, `speech_practice_screen.dart`.
+- **Thay đổi**: Thay thế các đoạn code hiển thị điểm số thủ công bằng widget `ScoreBadge`.
+
+## Kế hoạch xác minh
+
+### Kiểm tra thủ công
+1. Vào màn hình học từ vựng -> Trả lời đúng để điểm tăng từ 9 lên 10 -> Quan sát xem ô điểm số có bị "giật/nhảy" không.
+2. Kiểm tra độ đồng nhất về màu sắc, bo góc, và bóng đổ giữa Năng lượng và Ngôi sao.
+3. Kiểm tra trên các màn hình khác (Lật hình, Tập nói) để đảm bảo giao diện thống nhất toàn hệ thống.

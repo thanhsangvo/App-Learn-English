@@ -1,0 +1,93 @@
+# Thiết kế Màn Hình Streak - Chuỗi Học Tập 🔥
+
+Tạo tính năng Streak hoàn chỉnh: icon Ngọn lửa thay đổi trạng thái (xám/cam), màn hình Streak với Hero Animation, lịch tuần, và logic kiểm tra chuỗi tự động.
+
+---
+
+## Proposed Changes
+
+### Service Layer
+
+#### [MODIFY] [progress_service.dart](file:///Users/devsang/Developer/App Learn English/lib/core/services/progress_service.dart)
+
+Thêm các thuộc tính và phương thức mới:
+
+- `isStreakActiveToday` (RxBool) — Trạng thái đã học hôm nay chưa
+- `weeklyActivityDays` (RxList<String>) — Danh sách ngày đã học trong tuần (ISO format)
+- `_keyWeeklyDays` — Key lưu SharedPreferences
+- `checkDailyStreak()` — Public method gọi khi app resume từ background
+- Cập nhật [updateStreakAndPuzzle()](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#316-350) để set `isStreakActiveToday = true` và ghi vào `weeklyActivityDays`
+- Cập nhật [_loadProgress()](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#85-135) để load `weeklyActivityDays` và check `isStreakActiveToday`
+
+---
+
+### Controller + Binding
+
+#### [NEW] [streak_controller.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/controllers/streak_controller.dart)
+
+- Extends `GetxController`
+- Lấy data từ [ProgressService](file:///Users/devsang/Developer/App%20Learn%20English/lib/core/services/progress_service.dart#8-416): `streakCount`, `isActiveToday`, `weeklyDays`
+- Hàm `getWeekDayStatus(int weekday)` → trả về `active/inactive/today`
+- Hàm `navigateToHome()` → chuyển về tab Hành trình
+- Phát [celebration.mp3](file:///Users/devsang/Developer/App%20Learn%20English/assets/audio/celebration.mp3) khi mở screen và streak vừa tăng
+
+#### [NEW] [streak_binding.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/bindings/streak_binding.dart)
+
+- `lazyPut` → `StreakController`
+
+---
+
+### UI - Streak Screen
+
+#### [NEW] [streak_screen.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/streak_screen.dart)
+
+Layout từ trên xuống:
+
+1. **AppBar**: Nút back, title "Chuỗi học tập"
+2. **Hero Flame** (trung tâm): Container tròn gradient cam-đỏ, bên trong có `🔥` text lớn + số ngày. Hiệu ứng Glow bằng `BoxShadow` animated.
+3. **Lịch tuần**: Row 7 vòng tròn (T2→CN). Ngày đã học = 🔥 nhỏ/✓ vàng, chưa học = vòng tròn xám.
+4. **Foxy message**: Bubble trắng với text cổ vũ
+5. **CTA Button**: Nút cam lớn "Tiếp tục học ngay" → navigate về Hành trình
+
+---
+
+### Integration - Icon Ngọn Lửa
+
+#### [MODIFY] [practice_screen.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/practice_screen.dart)
+
+- Wrap icon 🔥 bằng `Hero(tag: 'streak_icon')`
+- Thêm `GestureDetector` → `Get.toNamed('/streak')`
+- Đổi màu dựa trên `isStreakActiveToday`: active = cam, inactive = xám
+- Thêm `AnimatedSwitcher` cho hiệu ứng chuyển màu
+
+#### [MODIFY] [home_screen.dart](file:///Users/devsang/Developer/App Learn English/lib/presentation/screens/home_screen.dart)
+
+- Thêm icon 🔥 nhỏ bên cạnh star count trong header
+- `GestureDetector` → `Get.toNamed('/streak')`
+- Đổi màu dựa trên `isStreakActiveToday`
+
+---
+
+### Routing
+
+#### [MODIFY] [app_routes.dart](file:///Users/devsang/Developer/App Learn English/lib/routes/app_routes.dart)
+
+- Thêm `static const streak = '/streak';`
+
+#### [MODIFY] [app_pages.dart](file:///Users/devsang/Developer/App Learn English/lib/routes/app_pages.dart)
+
+- Thêm `GetPage` cho `/streak` với `StreakBinding` và `Hero` transition
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `flutter analyze` — Không có lỗi mới
+
+### Manual Verification
+- Mở app → Ngọn lửa xám (chưa học hôm nay)
+- Hoàn thành 1 bài → Ngọn lửa chuyển cam + toast Foxy
+- Nhấn icon 🔥 → Hero animation bay ra giữa → Streak Screen
+- Lịch tuần hiển thị đúng ngày đã học
+- Nút "Tiếp tục học ngay" → về Hành trình

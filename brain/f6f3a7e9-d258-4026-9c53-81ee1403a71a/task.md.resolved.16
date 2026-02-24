@@ -1,0 +1,32 @@
+- [x] Research Shopee 2026 Fee Policy <!-- id: 0 -->
+- [x] Draft Project Description for Portfolio <!-- id: 1 -->
+- [x] Plan Technical Architecture <!-- id: 2 -->
+    - [x] Draft Implementation Plan <!-- id: 3 -->
+    - [x] User Approval of Tech Stack <!-- id: 4 -->
+- [x] Build Application <!-- id: 5 -->
+    - [x] Setup React Project <!-- id: 6 -->
+    - [x] Implement Calculator Logic <!-- id: 7 -->
+    - [x] Build UI Components <!-- id: 8 -->
+    - [x] Verify & Launch <!-- id: 9 -->
+    - [x] UI Polish & Logo Update <!-- id: 10 -->
+- [x] Saved Calculations Feature <!-- id: 11 -->
+    - [x] Create SavedResultsTable Component <!-- id: 12 -->
+    - [x] Implement Save Logic in App.jsx <!-- id: 13 -->
+    - [x] Add Save button to ResultsPanel <!-- id: 14 -->
+    - [x] Verify persistence with localStorage <!-- id: 15 -->
+- [x] Add Product Name Field <!-- id: 16 -->
+    - [x] Update CalculatorForm, App.jsx, and SavedResultsTable <!-- id: 17 -->
+- [x] Export Saved Results Table <!-- id: 18 -->
+    - [x] Implement exportAllToExcel and add button to SavedResultsTable <!-- id: 19 -->
+- [x] Affiliate Monetization <!-- id: 20 -->
+    - [x] Create AffiliateBanner Component <!-- id: 21 -->
+    - [x] Add contextual link under Packaging Cost input <!-- id: 22 -->
+    - [x] Integrate AffiliateBanner in App.jsx <!-- id: 23 -->
+- [x] Update Affiliate Link <!-- id: 24 -->
+    - [x] Update link in AffiliateBanner and CalculatorForm <!-- id: 25 -->
+- [x] Add Social Contact Links <!-- id: 26 -->
+    - [x] Implement Zalo and Facebook links in App.jsx footer <!-- id: 27 -->
+- [/] GitHub & Vercel Integration <!-- id: 28 -->
+    - [x] Initialize Git and commit code <!-- id: 29 -->
+    - [ ] Create GitHub Repository and Push <!-- id: 30 -->
+    - [ ] Link GitHub Repo to Vercel Project <!-- id: 31 -->
